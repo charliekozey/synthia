@@ -1,17 +1,9 @@
-// build oscillator bank
-// button: add new sine osc
-// button: add new square osc
-// button: add new saw osc
-// button: add new triangle osc
-// button: add new custom osc
+// TODO NEXT: polyphony; maybe by creating a stack of AudioContexts? 
+// Then startSound() would push a new AudioContext and connect each oscillator to it
+// and stopSound() would remove them all
 
-const addSine = document.getElementById("sine")
-const addSquare = document.getElementById("square")
-const addSaw = document.getElementById("sawtooth")
-const addTriangle = document.getElementById("triangle")
-const addCustom = document.getElementById("custom")
-const oscBank = document.getElementById("osc-bank")
 const oscGenerators = document.getElementById("osc-generators")
+const notes = {"a": 220, "s": 247, "d": 277, "f": 294, "g": 330, "h": 370, "j": 415, "k": 440, "l": 494}
 let audioContext
 let oscillators = []
 let oscNodes = []
@@ -19,28 +11,22 @@ let playing = false
 
 function addOscillator(e) {
     const newOsc = document.createElement("div")
-
+    const oscBank = document.getElementById("osc-bank")
     if(e.target.nodeName==="BUTTON") {
         newOsc.textContent = e.target.id
-        oscBank.append(newOsc)
-                
+        oscBank.append(newOsc) 
         oscillators.push({type: `${e.target.id}`, frequency: 220})
     }
 }
 
 function startSound(e) {
+    const input = e.key
     audioContext = new AudioContext()
-    console.log(audioContext)
-    console.log(playing)
+    console.log(oscillators)
 
-    if(e.key == "j" && !playing) {
+    if(Object.keys(notes).includes(input) && !playing) {
         oscillators.forEach(osc => {
-            // if(osc.id == parseInt(buttonId)) {
-            //     console.log("hit")
-            //     osc.start()
-            //     console.log(osc.id)
-            // }
-            oscNode = new OscillatorNode(audioContext, {type: osc.type, frequency: osc.frequency})
+            oscNode = new OscillatorNode(audioContext, {type: osc.type, frequency: notes[input]})
             oscNodes.push(oscNode)
             oscNode.connect(audioContext.destination)
             oscNode.start()
@@ -50,23 +36,17 @@ function startSound(e) {
 }
 
 function stopSound(e) {
-    if(e.key == "j") {
+    const input = e.key
+    if(Object.keys(notes).includes(input)) {
         oscNodes.forEach(oscNode => {
-            // if(osc.id == parseInt(buttonId)) {
-            //     console.log("hit")
-            //     osc.start()
-            //     console.log(osc.id)
-            // }
             oscNode.stop()
         })
         playing = false
         audioContext.close()
-        console.log("stop")
     }
 }
 
 oscGenerators.addEventListener("click", e => addOscillator(e))
-
 document.addEventListener("keydown", e => startSound(e))
 document.addEventListener("keyup", e => stopSound(e))
 
@@ -74,13 +54,3 @@ document.addEventListener("keyup", e => stopSound(e))
 // user login
 // save patches
 // beginner-friendly illustrations and self-guiding UI
-
-// const test = [1, 2, 3, 2]
-
-// test.forEach(num => {
-//     if(num === 2) {
-//         console.log("hit")
-//         // osc.connect(audioContext.destination)
-//         // console.log(osc)
-//     }
-// })
