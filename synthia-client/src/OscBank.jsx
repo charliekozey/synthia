@@ -1,15 +1,15 @@
 import React from 'react'
 import Oscillator from './Oscillator'
 
-function OscBank({ oscillators }) {
+function OscBank({oscillators, setOscillators}) {
   
     const oscillatorList = oscillators.map(osc => {
-        return <Oscillator type={ osc.type } />
+        return <Oscillator osc={osc} oscillators={oscillators} setOscillators={setOscillators} />
     })
     
   return (
     <div id="osc-bank">
-        { oscillatorList }
+        {oscillatorList}
         <h3>then use home row keys (the asdf row) to play</h3>
     </div>
   )

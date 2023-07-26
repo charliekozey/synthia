@@ -5,6 +5,7 @@ function OscGenerators({ oscillators, setOscillators }) {
     function generateOsc(e) {
         const newOsc = {
             type: e.target.id,
+            gain: 0.5
         }
         setOscillators([...oscillators, newOsc])
         console.log(oscillators)

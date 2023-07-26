@@ -62,8 +62,8 @@ document.addEventListener("keyup", e => stopSound(e))
   return (
     <>
       <Header />
-      <OscGenerators oscillators={ oscillators } setOscillators={ setOscillators } />
-      <OscBank oscillators ={ oscillators } />
+      <OscGenerators oscillators={oscillators} setOscillators={setOscillators} />
+      <OscBank oscillators ={oscillators} setOscillators={setOscillators} />
     </>
   )
 }

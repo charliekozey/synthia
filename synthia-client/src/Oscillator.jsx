@@ -1,16 +1,22 @@
 import { useState } from 'react'
 
-function Oscillator({ type }) {
+function Oscillator({oscillators, setOscillators, osc}) {
   const [gain, setGain] = useState(0.5)
+
+  const updatedOsc = {
+      type: osc.type,
+      gain: gain
+  }
+
   function changeGain(e) {
-    setGain(parseFloat(e.target.value))
+    setOscillators([...oscillators, updatedOsc])
   }
 
   return (
     <>
-        <h3>{type}</h3>
+        <h3>{osc.type}</h3>
         <label htmlFor="gain-slider">gain:</label>
-        <input type="range" value="0.5" min="0" max="1" step="0.01" onChange={changeGain}></input>
+        <input type="range" value={osc.gain} min="0" max="1" step="0.01" onChange={changeGain}></input>
     </>
   )
 }
