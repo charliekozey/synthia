@@ -9,13 +9,32 @@
 // microtonality?
 // user login
 // beginner-friendly illustrations and self-guiding UI
+// sequencer
 
 const oscGenerators = document.getElementById("osc-generators")
-const notes = {"a": 262, "w": 277, "s": 294, "e": 311, "d": 330, "f": 349, "t": 370, "g": 392, "y": 415, "h": 440, "u": 466, "j": 494, "k": 523, "o": 554, "l": 587, "p": 622, ";": 659, "'": 698}
-const audioContexts = []
+const keyboard = {
+    "a": {freq: 262, down: false}, 
+    "w": {freq: 277, down: false}, 
+    "s": {freq: 294, down: false}, 
+    "e": {freq: 311, down: false}, 
+    "d": {freq: 330, down: false}, 
+    "f": {freq: 349, down: false}, 
+    "t": {freq: 370, down: false}, 
+    "g": {freq: 392, down: false}, 
+    "y": {freq: 415, down: false}, 
+    "h": {freq: 440, down: false}, 
+    "u": {freq: 466, down: false}, 
+    "j": {freq: 494, down: false}, 
+    "k": {freq: 523, down: false}, 
+    "o": {freq: 554, down: false}, 
+    "l": {freq: 587, down: false}, 
+    "p": {freq: 622, down: false}, 
+    ";": {freq: 659, down: false}, 
+    "'": {freq: 698, down: false},
+}
+const audioContext = new AudioContext()
 const oscillators = []
 const oscNodes = []
-let audioContext
 let playing = false
 
 function addOscillator(e) {
@@ -23,52 +42,41 @@ function addOscillator(e) {
     const oscBank = document.getElementById("osc-bank")
     if(e.target.nodeName==="BUTTON") {
         newOsc.textContent = e.target.id
-        oscBank.append(newOsc) 
+        oscBank.append(newOsc)
         oscillators.push({type: `${e.target.id}`, frequency: 220})
     }
 }
 
 function startSound(e) {
     const input = e.key
-    audioContext = new AudioContext()
-
-    if(Object.keys(notes).includes(input) && !playing) {
+    
+    if(Object.keys(keyboard).includes(input) && !keyboard[input].down) {
         oscillators.forEach(osc => {
-            oscNode = new OscillatorNode(audioContext, {type: osc.type, frequency: notes[input]})
+            console.log(osc)
+            oscNode = new OscillatorNode(audioContext, {type: osc.type, frequency: keyboard[input].freq})
             oscNodes.push(oscNode)
             oscNode.connect(audioContext.destination)
             oscNode.start()
         })
-        playing = true
+        keyboard[input].down = true
+        console.log(keyboard[input].down)
+        console.log(keyboard)
     }
 }
 
 function stopSound(e) {
     const input = e.key
-    if(Object.keys(notes).includes(input)) {
+
+    if(Object.keys(keyboard).includes(input)) {
         oscNodes.forEach(oscNode => {
             oscNode.stop()
         })
-        playing = false
-        audioContext.close()
+        keyboard[input].down = false
+        console.log((keyboard[input].down))
+        console.log(keyboard)
     }
 }
 
 oscGenerators.addEventListener("click", e => addOscillator(e))
 document.addEventListener("keydown", e => startSound(e))
 document.addEventListener("keyup", e => stopSound(e))
-
-
-// testing audiocontext stack plan
-
-function pushAudioContext(e) {
-    const keys = ["z", "x", "c", "v", "b", "n", "m"]
-    if (keys.includes(e.key)) {
-        const newAudioContext = new AudioContext()
-        audioContexts.push(newAudioContext)
-
-        console.log(audioContexts)
-    }
-}
-
-document.addEventListener("keypress", e => pushAudioContext(e))
