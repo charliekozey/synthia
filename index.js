@@ -98,11 +98,12 @@ function stopSound(e) {
     const input = e.key
         
     if(Object.keys(keyboard).includes(input)) {
-        console.log(nodes)
         nodes.forEach(node => {
             if (node.key_pressed == input) {
                 node.gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.005)
-                setTimeout(() => nodes.splice(nodes.indexOf(node)), 6)
+                setTimeout(() => {
+                    node.gain.disconnect()
+                }, 6)
             }
         })
     }
