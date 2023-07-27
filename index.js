@@ -2,12 +2,12 @@
 // gain control for individual oscillators
 // waveform manipulation (asdr, lfo) for individual oscillators
 
-// TODO: 
+// TODO:
 // ~ o s c i l l o s c o p e ~
 // effects
 // lfo
 // EQ/filters
-// patches
+// loadable patches
 // microtonality?
 // user login
 // beginner-friendly illustrations and self-guiding UI
@@ -15,6 +15,9 @@
 // play more than 6 notes at a time?
 // stereo? spatial??
 // fix browser tab change bug (audio still plays)
+// arpeggiator
+// record output
+// note repeat
 
 const keyboard = {
     "a": {freq: 262, down: false}, 
@@ -36,46 +39,46 @@ const keyboard = {
     ";": {freq: 659, down: false}, 
     "'": {freq: 698, down: false},
 }
-const oscGenerators = document.getElementById("osc-generators")
+const oscName = document.getElementById("osc-name")
+const typeSelect = document.getElementById("type-select")
+const gainSlider = document.getElementById("gain-slider")
 const audioContext = new AudioContext()
 const oscillators = []
 const oscNodes = []
-let playing = false
 
-function addOscillator(e) {
-    const newOsc = document.createElement("div")
-    const oscBank = document.getElementById("osc-bank")
-    const oscTitle = document.createElement("h4")
-    const gainSlider = document.createElement("input")
-    const gainLabel = document.createElement("label")
+fetch("http://localhost:3000/patches")
+.then(res => res.json())
+.then(data => loadPatch(data[0].oscillators[0]))
 
-    gainSlider.type = "range"
-    gainSlider.name = "gain"
-    gainLabel.textContent = "gain"
-    
-    if(e.target.nodeName==="BUTTON") {
-        oscTitle.textContent = e.target.id
-        newOsc.append(oscTitle)
-        newOsc.append(gainLabel)
-        newOsc.append(gainSlider)
-        oscBank.append(newOsc)
-        oscillators.push({type: `${e.target.id}`})
-    }
+function loadPatch(oscillator) {
+    oscName.textContent = `Osc ${oscillator.name} >>`
+    typeSelect.value = oscillator.type
+    gainSlider.value = oscillator.gain
+
+    oscillators.push(oscillator)
 }
 
 function startSound(e) {
     const input = e.key
     
     if(Object.keys(keyboard).includes(input) && !keyboard[input].down) {
-        oscillators.forEach(osc => {
-            const gainNode = audioContext.createGain()
-            const oscNode = new OscillatorNode(audioContext, {type: osc.type, frequency: keyboard[input].freq})
-            oscNodes.push(oscNode)
-            oscNode.connect(gainNode)
-            gainNode.gain = 
-            gainNode.connect(audioContext.destination)
-            oscNode.start()
-        })
+        // oscillators.forEach(osc => {
+        //     oscNode = new OscillatorNode(audioContext, {type: osc.type, frequency: keyboard[input].freq})
+        //     gainNode = new GainNode(audioContext, { gain: parseFloat(osc.gain)})
+        //     oscNodes.push(oscNode)
+        //     oscNode.connect(gainNode)
+        //     gainNode.gain.value = parseFloat(osc.gain)
+        //     gainNode.connect(audioContext.destination)
+        //     oscNode.start()
+        //     console.log(osc.type)
+        // })
+        oscNode = new OscillatorNode(audioContext, {type: oscillators[0].type, frequency: keyboard[input].freq})
+        gainNode = new GainNode(audioContext, { gain: parseFloat(oscillators[0].gain)})
+        console.log(oscillators[0].gain)
+        oscNodes.push(oscNode)
+        oscNode.connect(gainNode)
+        gainNode.connect(audioContext.destination)
+        oscNode.start()
         keyboard[input].down = true
     }
 }
@@ -91,6 +94,15 @@ function stopSound(e) {
     }
 }
 
-oscGenerators.addEventListener("click", e => addOscillator(e))
+function changeWaveType(e) {
+    oscillators[0].type = (e.target.value)
+}
+
+function changeGain(e) {
+    oscillators[0].gain = e.target.value
+}
+
 document.addEventListener("keydown", e => startSound(e))
 document.addEventListener("keyup", e => stopSound(e))
+typeSelect.addEventListener("change", e => changeWaveType(e))
+gainSlider.addEventListener("change", e => changeGain(e))

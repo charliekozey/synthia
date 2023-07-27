@@ -5,28 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>~ s y n t h i a ~</title>
     <script defer src="index.js"></script>
-    <link rel="stylesheet" href="style.css"
+    <link rel="stylesheet" href="style.css"></link>
 </head>
 <body>
     <header>
         <h1>welcome to ~ s y n t h i a ~</h1>
     </header>
-
-    <div id="osc-generators">
-        <h3>first, add at least one oscillator:</h3>
-        <button id="sine">+ sine</button>
-        <button id="square">+ square</button>
-        <button id="sawtooth">+ saw</button>
-        <button id="triangle">+ triangle</button>
-        <button id="custom">+ custom</button>
-    </div>
-
+    <h2>
+        use home row keys (the asdf row) to play
+    </h2>
     <div id="osc-bank">
-
+        <em><span id="osc-name"></span></em>
+        <label htmlFor="type">wave:</label>
+        <select id="type-select" name="type" min=0 max=1 step=0.01>
+          <option value="sine">sine</option>
+          <option value="triangle">triangle</option>
+          <option value="sawtooth">sawtooth</option>
+          <option value="square">square</option>
+        </select>
+        <label htmlFor="gain-slider">gain:</label>
+        <input id="gain-slider" name="gain" type="range" min=0 max=1 step=0.01></input>
     </div>
 
-    <h3>
-        then use home row keys (the asdf row) to play
-    </h3>
 </body>
 </html>

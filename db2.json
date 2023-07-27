@@ -7,7 +7,7 @@
                 {
                     "name": 1,
                     "type": "triangle",
-                    "gain": 0.9,
+                    "gain": 0.5,
                     "attack": 0.5,
                     "decay": 0.5,
                     "sustain": 0.5,
@@ -15,7 +15,7 @@
                 },
                 {
                     "name": 2,
-                    "type": "triangle",
+                    "type": "sine",
                     "gain": 0.5,
                     "attack": 0.5,
                     "decay": 0.5,
