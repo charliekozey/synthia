@@ -1,8 +1,9 @@
 // TODO NEXT: 
-// gain control for individual oscillators
-// waveform manipulation (asdr, lfo) for individual oscillators
+// fix gain slider bug
+// fix note not stopping bug
 
 // TODO:
+// waveform manipulation (asdr) for individual oscillators
 // ~ o s c i l l o s c o p e ~
 // effects
 // lfo
@@ -18,6 +19,8 @@
 // arpeggiator
 // record output
 // note repeat
+// multiple oscillators
+// remove unused gain node on note end
 
 const keyboard = {
     "a": {freq: 262, down: false}, 
@@ -44,7 +47,7 @@ const typeSelect = document.getElementById("type-select")
 const gainSlider = document.getElementById("gain-slider")
 const audioContext = new AudioContext()
 const oscillators = []
-const oscNodes = []
+const nodes = []
 
 fetch("http://localhost:3000/patches")
 .then(res => res.json())
@@ -72,37 +75,39 @@ function startSound(e) {
         //     oscNode.start()
         //     console.log(osc.type)
         // })
-        oscNode = new OscillatorNode(audioContext, {type: oscillators[0].type, frequency: keyboard[input].freq})
-        gainNode = new GainNode(audioContext, { gain: parseFloat(oscillators[0].gain)})
-        console.log(oscillators[0].gain)
-        oscNodes.push(oscNode)
+        const oscNode = new OscillatorNode(audioContext, {type: oscillators[0].type, frequency: keyboard[input].freq})
+        const gainNode = new GainNode(audioContext, { gain: parseFloat(oscillators[0].gain)})
+
         oscNode.connect(gainNode)
         gainNode.connect(audioContext.destination)
         oscNode.start()
+
+        gainSlider.addEventListener("input", e => gainNode.gain.value = parseFloat(e.target.value))
+        typeSelect.addEventListener("change", e => oscillators[0].type = e.target.value)
+
+        nodes.push({
+            osc: oscNode,
+            gain: gainNode,
+            key_pressed: input
+        })
         keyboard[input].down = true
     }
 }
 
 function stopSound(e) {
     const input = e.key
-
+        
     if(Object.keys(keyboard).includes(input)) {
-        oscNodes.forEach(oscNode => {
-            if (oscNode.frequency.value == keyboard[input].freq) oscNode.stop()
+        console.log(nodes)
+        nodes.forEach(node => {
+            if (node.key_pressed == input) {
+                node.gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.005)
+                setTimeout(() => nodes.splice(nodes.indexOf(node)), 6)
+            }
         })
-        keyboard[input].down = false
     }
-}
-
-function changeWaveType(e) {
-    oscillators[0].type = (e.target.value)
-}
-
-function changeGain(e) {
-    oscillators[0].gain = e.target.value
+    keyboard[input].down = false
 }
 
 document.addEventListener("keydown", e => startSound(e))
 document.addEventListener("keyup", e => stopSound(e))
-typeSelect.addEventListener("change", e => changeWaveType(e))
-gainSlider.addEventListener("change", e => changeGain(e))
