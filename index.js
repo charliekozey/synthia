@@ -1,10 +1,9 @@
-// TODO NEXT: 
-// fix gain slider bug
-// fix note not stopping bug
+// NOW DOING: 
+// waveform manipulation (asdr) for individual oscillators
 
 // TODO:
-// waveform manipulation (asdr) for individual oscillators
 // ~ o s c i l l o s c o p e ~
+// fix clicking on gain slider change
 // effects
 // lfo
 // EQ/filters
@@ -19,7 +18,7 @@
 // arpeggiator
 // record output
 // note repeat
-// multiple oscillators
+// multiple oscillatorsa
 // remove unused gain node on note end
 
 const keyboard = {
@@ -75,14 +74,15 @@ function startSound(e) {
         //     oscNode.start()
         //     console.log(osc.type)
         // })
-        const oscNode = new OscillatorNode(audioContext, {type: oscillators[0].type, frequency: keyboard[input].freq})
-        const gainNode = new GainNode(audioContext, { gain: parseFloat(oscillators[0].gain)})
+        const oscNode = new OscillatorNode(audioContext, { type: oscillators[0].type, frequency: keyboard[input].freq })
+        const gainNode = new GainNode(audioContext, { gain: oscillators[0].gain })
 
         oscNode.connect(gainNode)
         gainNode.connect(audioContext.destination)
         oscNode.start()
 
         gainSlider.addEventListener("input", e => gainNode.gain.value = parseFloat(e.target.value))
+        gainSlider.addEventListener("change", e => oscillators[0].gain = parseFloat(e.target.value))
         typeSelect.addEventListener("change", e => oscillators[0].type = e.target.value)
 
         nodes.push({
@@ -106,8 +106,8 @@ function stopSound(e) {
                 }, 6)
             }
         })
+        keyboard[input].down = false
     }
-    keyboard[input].down = false
 }
 
 document.addEventListener("keydown", e => startSound(e))
