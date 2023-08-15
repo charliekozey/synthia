@@ -17,6 +17,13 @@ class User(db.Model):
     patches = db.relationship('Patch', back_populates='user', lazy=True)
     # favorite_patches = db.relationship('Patch', secondary=favorite_patch_association, back_populates='favorited_by', lazy=True)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "patches": self.patches
+        }
+
 class Patch(db.Model):
     __tablename__ = "patches"
 
@@ -26,6 +33,12 @@ class Patch(db.Model):
     user = db.relationship('User', back_populates='patches')
     # favorited_by = db.relationship('User', secondary=favorite_patch_association, back_populates='favorite_patches', lazy=True)
     # oscillators = db.relationship('Oscillator', back_populates='patch', lazy=True)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+        }
 
 class Favorite(db.Model):
     __tablename__ = "favorites"
