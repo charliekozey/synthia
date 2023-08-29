@@ -18,10 +18,12 @@ class User(db.Model):
     # favorite_patches = db.relationship('Patch', secondary=favorite_patch_association, back_populates='favorited_by', lazy=True)
 
     def to_dict(self):
+        patches = Patch.query.all()
+
         return {
             "id": self.id,
             "name": self.name,
-            "patches": self.patches
+            "patches": [patch.to_dict() for patch in patches]
         }
 
 class Patch(db.Model):

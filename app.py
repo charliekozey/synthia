@@ -1,10 +1,12 @@
 from flask import Flask, make_response, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_cors import CORS
 from models import User, Patch, Favorite, Oscillator
 from database import db
 
 app = Flask(__name__)
+CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/synthia-db'
 
 migrate = Migrate(app, db)
@@ -20,13 +22,20 @@ def index_users():
     users = User.query.all()
     user_dicts = [user.to_dict() for user in users]
     
-    for user in user_dicts:
-        for patch in user['patches']:
-            print(patch)
+    # for user in user_dicts:
+    #     for patch in user['patches']:
+    #         print(patch)
             # user['patches'] = [patch.to_dict() for patch in user['patches']]
 
-    return ""
-    # return make_response(jsonify(user_dicts), 200)
+    # return ""
+    return make_response(jsonify(user_dicts), 200)
+
+@app.get('/patches')
+def index_patches():
+    patches = Patch.query.all()
+    patch_dicts = [patch.to_dict() for patch in patches]
+
+    return make_response(jsonify(patch_dicts), 200)
 
 # @app.get('/patches')
 

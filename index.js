@@ -1,8 +1,9 @@
 // NOW DOING: 
-// waveform manipulation (asdr) for individual oscillators
+// building routes for users, oscillators, patches
 
 // TODO:
 // ~ o s c i l l o s c o p e ~
+// waveform manipulation (asdr) for individual oscillators
 // fix clicking on gain slider change
 // effects
 // lfo
@@ -18,8 +19,12 @@
 // arpeggiator
 // record output
 // note repeat
-// multiple oscillatorsa
+// multiple oscillators
 // remove unused gain node on note end
+
+// IDEAS:
+// target ed space? younger audience?
+// maybe similar target audience to hookpad
 
 const keyboard = {
     "a": {freq: 262, down: false}, 
@@ -48,9 +53,18 @@ const audioContext = new AudioContext()
 const oscillators = []
 const nodes = []
 
-fetch("http://localhost:3000/patches")
+fetch("http://localhost:4000/patches")
 .then(res => res.json())
-.then(data => loadPatch(data[0].oscillators[0]))
+.then(data => initializePatches(data))
+
+function initializePatches(data) {
+    const patchBank = document.getElementById("patch-bank")
+    data.forEach(patch => {
+        const patchItem = document.createElement("div")
+        patchItem.textContent = patch.name
+        patchBank.append(patchItem)
+    })
+}
 
 function loadPatch(oscillator) {
     oscName.textContent = `Osc ${oscillator.name} >>`
