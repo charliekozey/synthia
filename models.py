@@ -33,27 +33,47 @@ class Patch(db.Model):
     name = db.Column(db.String(50), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     user = db.relationship('User', back_populates='patches')
+    oscillators = db.relationship('Oscillator', back_populates='patch', lazy=True)
     # favorited_by = db.relationship('User', secondary=favorite_patch_association, back_populates='favorite_patches', lazy=True)
-    # oscillators = db.relationship('Oscillator', back_populates='patch', lazy=True)
+
+    def to_dict(self):
+        oscillators = Oscillator.query.all()
+
+        return {
+            "id": self.id,
+            "name": self.name,
+            "oscillators": [osc.to_dict() for osc in oscillators]
+        }
+
+class Oscillator(db.Model):
+    __tablename__ = "oscillators"
+
+    id = db.Column(db.Integer, primary_key=True)
+    number = db.Column(db.Integer, nullable=False)
+    osc_type = db.Column(db.String(20), nullable=False)
+    gain = db.Column(db.Numeric(precision=3, scale=2), nullable=False)
+    attack = db.Column(db.Numeric(precision=3, scale=2), nullable=False)
+    decay = db.Column(db.Numeric(precision=3, scale=2), nullable=False)
+    sustain = db.Column(db.Numeric(precision=3, scale=2), nullable=False)
+    release = db.Column(db.Numeric(precision=3, scale=2), nullable=False)
+    patch_id = db.Column(db.Integer, db.ForeignKey('patches.id'), nullable=False)
+    patch = db.relationship('Patch', back_populates='oscillators', cascade='delete')
 
     def to_dict(self):
         return {
             "id": self.id,
-            "name": self.name,
+            "number": self.number,
+            "osc_type": self.osc_type,
+            "gain": self.gain,
+            "attack": self.attack,
+            "decay": self.decay,
+            "sustain": self.sustain,
+            "release": self.release,
         }
 
 class Favorite(db.Model):
     __tablename__ = "favorites"
     id = db.Column(db.Integer, primary_key=True)
-    # user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    # patch_id = db.Column(db.Integer, db.ForeignKey('patches.id'), nullable=False)
-
-class Oscillator(db.Model):
-    __tablename__ = "oscillators"
-    id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String(50), nullable=False)
-    # patch_id = db.Column(db.Integer, db.ForeignKey('patches.id'), nullable=False)
-    # patch = db.relationship('Patch', back_populates='oscillators', cascade='delete')
 
 if __name__ == '__main__':
     db.create_all()

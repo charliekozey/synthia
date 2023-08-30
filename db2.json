@@ -5,7 +5,7 @@
             "name": "bloop",
             "oscillators": [
                 {
-                    "name": 1,
+                    "number": 1,
                     "type": "triangle",
                     "gain": 0.5,
                     "attack": 0.5,
@@ -14,7 +14,7 @@
                     "release": 0.5
                 },
                 {
-                    "name": 2,
+                    "number": 2,
                     "type": "sine",
                     "gain": 0.5,
                     "attack": 0.5,
@@ -23,7 +23,7 @@
                     "release": 0.5
                 },
                 {
-                    "name": 3,
+                    "number": 3,
                     "type": "sawtooth",
                     "gain": 0.5,
                     "attack": 0.5,
