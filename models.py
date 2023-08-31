@@ -18,12 +18,10 @@ class User(db.Model):
     # favorite_patches = db.relationship('Patch', secondary=favorite_patch_association, back_populates='favorited_by', lazy=True)
 
     def to_dict(self):
-        patches = Patch.query.all()
-
         return {
             "id": self.id,
             "name": self.name,
-            "patches": [patch.to_dict() for patch in patches]
+            "patches": [patch.to_dict() for patch in self.patches]
         }
 
 class Patch(db.Model):
@@ -37,12 +35,11 @@ class Patch(db.Model):
     # favorited_by = db.relationship('User', secondary=favorite_patch_association, back_populates='favorite_patches', lazy=True)
 
     def to_dict(self):
-        oscillators = Oscillator.query.all()
 
         return {
             "id": self.id,
             "name": self.name,
-            "oscillators": [osc.to_dict() for osc in oscillators]
+            "oscillators": [osc.to_dict() for osc in self.oscillators]
         }
 
 class Oscillator(db.Model):

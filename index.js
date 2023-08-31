@@ -1,5 +1,5 @@
 // NOW DOING: 
-// building routes for users, oscillators, patches
+// rough sketch of ui
 
 // TODO:
 // ~ o s c i l l o s c o p e ~
@@ -47,9 +47,6 @@ const keyboard = {
     ";": {freq: 659, down: false}, 
     "'": {freq: 698, down: false},
 }
-const oscName = document.getElementById("osc-name")
-const typeSelect = document.getElementById("type-select")
-const gainSlider = document.getElementById("gain-slider")
 const audioContext = new AudioContext()
 const oscillators = []
 const nodes = []
@@ -64,15 +61,24 @@ function initializePatches(data) {
         const patchItem = document.createElement("div")
         patchItem.textContent = patch.name
         patchBank.append(patchItem)
+        patchItem.addEventListener("click", e => {
+            loadPatch(patch)
+        })
     })
 }
 
-function loadPatch(oscillator) {
-    oscName.textContent = `Osc ${oscillator.name} >>`
-    typeSelect.value = oscillator.type
-    gainSlider.value = oscillator.gain
+function loadPatch(patch) {
+    patch.oscillators.forEach(osc => {
+        console.log(osc.gain)
+        const oscName = document.getElementById("osc-name")
+        const typeSelect = document.getElementById("type-select")
+        const gainSlider = document.getElementById("gain-slider")
+        oscName.textContent = `Osc ${osc.number} >>`
+    })
+    // typeSelect.value = oscillator.type
+    // gainSlider.value = oscillator.gain
 
-    oscillators.push(oscillator)
+    // oscillators.push(oscillator)
 }
 
 function startSound(e) {
