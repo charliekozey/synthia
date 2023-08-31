@@ -1,4 +1,5 @@
 // NOW DOING: 
+// gain sliders not working right; i think there's an extra node hanging out somewhere
 // remove click sound on note end
 
 // TODO:
