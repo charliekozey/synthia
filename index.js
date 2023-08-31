@@ -1,5 +1,5 @@
 // NOW DOING: 
-// rough sketch of ui
+// remove click sound on note end
 
 // TODO:
 // ~ o s c i l l o s c o p e ~
@@ -68,49 +68,47 @@ function initializePatches(data) {
 }
 
 function loadPatch(patch) {
+    oscillators.length = 0
     patch.oscillators.forEach(osc => {
-        console.log(osc.gain)
-        const oscName = document.getElementById("osc-name")
-        const typeSelect = document.getElementById("type-select")
-        const gainSlider = document.getElementById("gain-slider")
-        oscName.textContent = `Osc ${osc.number} >>`
+        const typeSelect = document.getElementById(`type-select-${osc.number}`)
+        const gainSlider = document.getElementById(`gain-slider-${osc.number}`)
+        typeSelect.value = osc.osc_type
+        gainSlider.value = osc.gain
+        oscillators.push(osc)
+        console.log(osc.number)
     })
-    // typeSelect.value = oscillator.type
-    // gainSlider.value = oscillator.gain
 
-    // oscillators.push(oscillator)
 }
 
 function startSound(e) {
     const input = e.key
     
     if(Object.keys(keyboard).includes(input) && !keyboard[input].down) {
-        // oscillators.forEach(osc => {
-        //     oscNode = new OscillatorNode(audioContext, {type: osc.type, frequency: keyboard[input].freq})
-        //     gainNode = new GainNode(audioContext, { gain: parseFloat(osc.gain)})
-        //     oscNodes.push(oscNode)
-        //     oscNode.connect(gainNode)
-        //     gainNode.gain.value = parseFloat(osc.gain)
-        //     gainNode.connect(audioContext.destination)
-        //     oscNode.start()
-        //     console.log(osc.type)
-        // })
-        const oscNode = new OscillatorNode(audioContext, { type: oscillators[0].type, frequency: keyboard[input].freq })
-        const gainNode = new GainNode(audioContext, { gain: oscillators[0].gain })
+        oscillators.forEach(osc => {
+            const oscNode = new OscillatorNode(audioContext, {type: osc.type, frequency: keyboard[input].freq})
+            const gainNode = new GainNode(audioContext, { gain: parseFloat(osc.gain)})
+            const typeSelect = document.getElementById(`type-select-${osc.number}`)
+            const gainSlider = document.getElementById(`gain-slider-${osc.number}`)
 
-        oscNode.connect(gainNode)
-        gainNode.connect(audioContext.destination)
-        oscNode.start()
+            // oscNodes.push(oscNode)
+            oscNode.connect(gainNode)
+            gainNode.gain.value = parseFloat(osc.gain)
+            gainNode.connect(audioContext.destination)
+            oscNode.start()
+            console.log(osc.type)
 
-        gainSlider.addEventListener("input", e => gainNode.gain.value = parseFloat(e.target.value))
-        gainSlider.addEventListener("change", e => oscillators[0].gain = parseFloat(e.target.value))
-        typeSelect.addEventListener("change", e => oscillators[0].type = e.target.value)
+            gainSlider.addEventListener("input", e => gainNode.gain.value = parseFloat(e.target.value))
+            gainSlider.addEventListener("change", e => oscillators[0].gain = parseFloat(e.target.value))
+            typeSelect.addEventListener("change", e => oscillators[0].type = e.target.value)
 
-        nodes.push({
-            osc: oscNode,
-            gain: gainNode,
-            key_pressed: input
+            nodes.push({
+                osc: oscNode,
+                gain: gainNode,
+                key_pressed: input
+            })
         })
+
+
         keyboard[input].down = true
     }
 }
