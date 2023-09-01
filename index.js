@@ -4,6 +4,7 @@
 // fix: behavior differs between click+slide vs. click on gain sliders
 
 // TODO:
+// update gitignore
 // logarithmic release slider
 // clear unused nodes on note end
 // investigate beating
