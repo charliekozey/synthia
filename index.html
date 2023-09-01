@@ -14,11 +14,15 @@
     <h2>
         use home row keys (the asdf row) to play
     </h2>
+    <h2>
+        press escape to stop all sound
+    </h2>
     <div id="patch-bank"></div>
     <div id="osc-bank">
         <div>
+            <h2 id="patch-title"></h2>
             <em><span id="osc-name">Osc 1</span></em>
-            <label htmlFor="type">wave:</label>
+            <label htmlFor="type-select-1">wave:</label>
             <select id="type-select-1" name="type-1">
               <option value="sine">sine</option>
               <option value="triangle">triangle</option>
@@ -26,23 +30,27 @@
               <option value="square">square</option>
             </select>
             <label htmlFor="gain-slider">gain:</label>
-            <input id="gain-slider-1" name="gain" type="range" min=0.001 max=1 step=0.01></input>
+            <input id="gain-slider-1" name="gain-1" type="range" min=0.001 max=1 step=0.01></input>
+            <label htmlFor="release-slider-1">release:</label>
+            <input id="release-slider-1" name="release-1" type="range" min=0.001 max=1 step=0.01></input>
         </div>
         <div>
             <em><span id="osc-name">Osc 2</span></em>
-            <label htmlFor="type">wave:</label>
+            <label htmlFor="type-select-2">wave:</label>
             <select id="type-select-2" name="type-2">
               <option value="sine">sine</option>
               <option value="triangle">triangle</option>
               <option value="sawtooth">sawtooth</option>
               <option value="square">square</option>
             </select>
-            <label htmlFor="gain-slider">gain:</label>
-            <input id="gain-slider-2" name="gain" type="range" min=0.001 max=1 step=0.01></input>
+            <label htmlFor="gain-slider-2">gain:</label>
+            <input id="gain-slider-2" name="gain" type="range" min=0.0001 max=1 step=0.01></input>
+            <label htmlFor="release-slider-2">release:</label>
+            <input id="release-slider-2" name="release-2" type="range" min=0.001 max=1 step=0.01></input>
         </div>
         <div>
             <em><span id="osc-name">Osc 3</span></em>
-            <label htmlFor="type">wave:</label>
+            <label htmlFor="type-select-3">wave:</label>
             <select id="type-select-3" name="type-3">
               <option value="sine">sine</option>
               <option value="triangle">triangle</option>
@@ -51,6 +59,8 @@
             </select>
               <label htmlFor="gain-slider-3">gain:</label>
               <input id="gain-slider-3" name="gain" type="range" min=0.001 max=1 step=0.01></input>
+              <label htmlFor="release-slider-3">release:</label>
+              <input id="release-slider-3" name="release-3" type="range" min=0.001 max=1 step=0.01></input>
         </div>
     </div>
 
