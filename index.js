@@ -86,12 +86,17 @@ function loadPatch(patch) {
     patch.oscillators.forEach(osc => {
         const typeSelect = document.getElementById(`type-select-${osc.number}`)
         const gainSlider = document.getElementById(`gain-slider-${osc.number}`)
+        const attackSlider = document.getElementById(`attack-slider-${osc.number}`)
         const releaseSlider = document.getElementById(`release-slider-${osc.number}`)
         typeSelect.value = osc.osc_type
         gainSlider.value = osc.gain
+        attackSlider.value = osc.attack
         releaseSlider.value = osc.release
         oscillators.push(osc)
+
+        console.log(osc.release + "=>" + logValue(osc.release))
     })
+
 }
 
 function startSound(e) {
@@ -101,7 +106,8 @@ function startSound(e) {
     
     if(Object.keys(keyboard).includes(input) && !keyboard[input].down) {
         oscillators.forEach(osc => {
-            console.log(osc.osc_type)
+            const attackTime = logValue(osc.attack)
+            console.log(attackTime)
             const oscNode = new OscillatorNode(audioContext, {type: osc.osc_type, frequency: keyboard[input].freq})
             const gainNode = new GainNode(audioContext, { gain: parseFloat(osc.gain)})
             const typeSelect = document.getElementById(`type-select-${osc.number}`)
@@ -109,7 +115,10 @@ function startSound(e) {
             const releaseSlider = document.getElementById(`release-slider-${osc.number}`)
 
             oscNode.connect(gainNode)
-            gainNode.gain.value = (parseFloat(osc.gain) * 0.01)
+            // gainNode.gain.value = (parseFloat(osc.gain) * 0.01)
+            gainNode.gain.setValueAtTime(0.0000000001, audioContext.currentTime)
+            // node.gain_node.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.05)
+            gainNode.gain.exponentialRampToValueAtTime(parseFloat(osc.gain) * 0.01, audioContext.currentTime + parseFloat(attackTime * 0.1))
             gainNode.connect(audioContext.destination)
             oscNode.start()
 
@@ -134,12 +143,12 @@ function stopSound(e) {
     if(Object.keys(keyboard).includes(input)) {
         nodes.forEach(node => {
             
-            const releaseTime = node.osc_data.release
+            const releaseTime = logValue(node.osc_data.release)
             if (node.key_pressed == input) {
                 const index = nodes.indexOf(node)
                 node.gain_node.gain.setValueAtTime(node.gain_node.gain.value, audioContext.currentTime)
                 // node.gain_node.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.05)
-                node.gain_node.gain.exponentialRampToValueAtTime(0.0000000001, audioContext.currentTime + parseFloat(releaseTime)*5)
+                node.gain_node.gain.exponentialRampToValueAtTime(0.0000000001, audioContext.currentTime + parseFloat(releaseTime))
 
                 // setTimeout(() => {
                 //     node.gain_node.disconnect()
@@ -179,3 +188,28 @@ document.addEventListener("keydown", e => startSound(e))
 document.addEventListener("keyup", e => stopSound(e))
 document.addEventListener("keydown",  e => changeOctave(e))
 document.addEventListener("keydown",  e => panic(e))
+
+
+function logValue(position) {
+    const minInput = 0
+    const maxInput = 100
+
+    const minValue = Math.log(1)
+    const maxValue = Math.log(1000000000)
+
+    const scale = (maxInput - minInput) / (maxValue - minValue)
+
+    return Math.exp(minValue + scale*(position-minInput))
+}
+
+console.log("logValue(0.0) = ", logValue(0.0))
+console.log("logValue(0.1) = ", logValue(0.1))
+console.log("logValue(0.2) = ", logValue(0.2))
+console.log("logValue(0.3) = ", logValue(0.3))
+console.log("logValue(0.4) = ", logValue(0.4))
+console.log("logValue(0.5) = ", logValue(0.5))
+console.log("logValue(0.6) = ", logValue(0.6))
+console.log("logValue(0.7) = ", logValue(0.7))
+console.log("logValue(0.8) = ", logValue(0.8))
+console.log("logValue(0.9) = ", logValue(0.9))
+console.log("logValue(1.0) = ", logValue(1.0))
