@@ -4,3 +4,7 @@ body {
     text-shadow: 1px 1px cyan;
     color: #333333;
 }
+
+#save-status {
+    display: none;
+}

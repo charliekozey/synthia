@@ -1,5 +1,6 @@
 // function todo() {
     // NOW DOING:
+        // refactor to React bc state is getting complicated
         // save patches
         // user login
     
@@ -28,8 +29,10 @@
         // record output
         // note repeat
         // remove unused gain node on note end
-        // refactor: fix ungainly (pun very much intended) `node.gain_node.gain` situation
-    
+    // REFACTOR: 
+        // fix ungainly (pun very much intended) `node.gain_node.gain` situation
+        // abstract out updateGain/updateRelease/updateAttack etc functions
+
     // IDEAS:
         // target ed space? younger audience?
         // display held down keys in visual representation (qwerty? piano? both?)
@@ -67,9 +70,9 @@ const nodes = []
 
 fetch("http://localhost:4000/patches")
 .then(res => res.json())
-.then(data => initializePatches(data))
+.then(data => initializePatchList(data))
 
-function initializePatches(data) {
+function initializePatchList(data) {
     const patchBank = document.getElementById("patch-bank")
     data.forEach(patch => {
         const patchItem = document.createElement("div")
@@ -86,8 +89,10 @@ function loadPatch(patch) {
     const patchTitle = document.getElementById("patch-title")
     patchTitle.textContent = patch.name
 
+    
+    
     oscillators.length = 0
-
+    
     patch.oscillators.forEach(osc => {
         const typeSelect = document.getElementById(`type-select-${osc.number}`)
         const gainSlider = document.getElementById(`gain-slider-${osc.number}`)
@@ -97,6 +102,9 @@ function loadPatch(patch) {
         gainSlider.value = osc.gain
         attackSlider.value = osc.attack
         releaseSlider.value = osc.release
+
+        gainSlider.addEventListener("input", e => updateGain(e, osc.gain, osc.id))
+        
         oscillators.push(osc)
 
         console.log(osc.release + "=>" + logValue(osc.release))
@@ -123,13 +131,14 @@ function startSound(e) {
             // gainNode.gain.value = (parseFloat(osc.gain) * 0.01)
             gainNode.gain.setValueAtTime(0.0000000001, audioContext.currentTime)
             // node.gain_node.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.05)
-            gainNode.gain.exponentialRampToValueAtTime(parseFloat(osc.gain) * 0.01, audioContext.currentTime + parseFloat(attackTime * 0.1))
+            gainNode.gain.exponentialRampToValueAtTime(parseFloat(osc.gain) * 0.1, audioContext.currentTime + parseFloat(attackTime * 0.1))
             gainNode.connect(audioContext.destination)
             oscNode.start()
 
-            gainSlider.addEventListener("input", e => gainNode.gain.value = parseFloat(e.target.value))
-            gainSlider.addEventListener("change", e => oscillators[0].gain = parseFloat(e.target.value))
-            typeSelect.addEventListener("change", e => oscillators[0].osc_type = e.target.value)
+            gainSlider.addEventListener("input", e => updateGain(e, gainNode.gain.value, osc.id))
+            releaseSlider.addEventListener("input", e => oscillators[0].gain = parseFloat(e.target.value))
+            attackSlider.addEventListener("input", e => oscillators[0].gain = parseFloat(e.target.value))
+            typeSelect.addEventListener("input", e => oscillators[0].osc_type = e.target.value)
 
             nodes.push({
                 osc_node: oscNode,
@@ -194,6 +203,27 @@ function panic(e) {
             }, 51)
         })
     }
+}
+
+function updateGain(e, gainToUpdate, oscId) {
+    // const saveStatus = document.getElementById("save-status")
+    // saveStatus.style.display = "block"
+    console.log(oscId)
+    console.log("updating gain")
+    console.log(e)
+    gainToUpdate = parseFloat(e.target.value)
+    console.log(gainToUpdate)
+
+    fetch(`http://localhost:4000/oscillators/${oscId}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        },
+        body: JSON.stringify({gain: gainToUpdate})
+    })
+        .then(res => res.json())
+        .then(data => console.log(data.message))
 }
 
 document.addEventListener("keydown", e => startSound(e))
