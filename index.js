@@ -1,38 +1,43 @@
-// NOW DOING:
-// waveform manipulation (asdr) for individual oscillators
-// gain sliders not working right; i think there's an extra node hanging out somewhere
-// fix: behavior differs between click+slide vs. click on gain sliders
-
-// TODO:
-// update gitignore
-// logarithmic release slider
-// clear unused nodes on note end
-// investigate beating
-// ~ o s c i l l o s c o p e ~
-// fix static on gain slider change
-// effects
-// lfo
-// EQ/filters
-// microtonality?
-// user login
-// beginner-friendly illustrations and self-guiding UI
-// sequencer
-// play more than 6 notes at a time?
-// stereo? spatial??
-// fix browser tab change bug (audio still plays)
-// arpeggiator
-// record output
-// note repeat
-// remove unused gain node on note end
-// refactor: fix ungainly (pun very much intended) `node.gain_node.gain` situation
-
-// IDEAS:
-// target ed space? younger audience?
-// display held down keys in visual representation (qwerty? piano? both?)
-// calculate chord from held notes and display it
-// incorporate sequencer, etc
-// maybe similar target audience to hookpad
-// trackpad as xy manipulator for pitch, other params
+// function todo() {
+    // NOW DOING:
+        // save patches
+        // user login
+    
+    // TODO:
+        // fix attack time behavior
+        // waveform manipulation (asdr) for individual oscillators
+        // gain sliders not working right; i think there's an extra node hanging out somewhere
+        // fix: behavior differs between click+slide vs. click on gain sliders
+        // update gitignore
+        // logarithmic release slider
+        // clear unused nodes on note end
+        // investigate beating
+        // ~ o s c i l l o s c o p e ~
+        // fix static on gain slider change
+        // effects
+        // lfo
+        // EQ/filters
+        // microtonality?
+        // user login
+        // beginner-friendly illustrations and self-guiding UI
+        // sequencer
+        // play more than 6 notes at a time?
+        // stereo? spatial??
+        // fix browser tab change bug (audio still plays)
+        // arpeggiator
+        // record output
+        // note repeat
+        // remove unused gain node on note end
+        // refactor: fix ungainly (pun very much intended) `node.gain_node.gain` situation
+    
+    // IDEAS:
+        // target ed space? younger audience?
+        // display held down keys in visual representation (qwerty? piano? both?)
+        // calculate chord from held notes and display it
+        // incorporate sequencer, etc
+        // maybe similar target audience to hookpad
+        // trackpad as xy manipulator for pitch, other params
+// }
 
 const keyboard = {
     "a": {freq: 262, down: false}, 
@@ -107,7 +112,7 @@ function startSound(e) {
     if(Object.keys(keyboard).includes(input) && !keyboard[input].down) {
         oscillators.forEach(osc => {
             const attackTime = logValue(osc.attack)
-            console.log(attackTime)
+            console.log(osc.number + " activating")
             const oscNode = new OscillatorNode(audioContext, {type: osc.osc_type, frequency: keyboard[input].freq})
             const gainNode = new GainNode(audioContext, { gain: parseFloat(osc.gain)})
             const typeSelect = document.getElementById(`type-select-${osc.number}`)
@@ -177,10 +182,17 @@ function changeOctave(e) {
 }
 
 function panic(e) {
-    if (e.key == "Escape") {
-        for (const node in nodes) {
-            node.gain_node.gain.value = 0
-        }
+    if (e.key == "Escape"){
+        nodes.forEach(node => {
+            console.log("stopping node")
+            node.gain_node.gain.setValueAtTime(node.gain_node.gain.value, audioContext.currentTime)
+            node.gain_node.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.002)
+
+            setTimeout(() => {
+                node.gain_node.disconnect()
+                node.osc_node.disconnect()
+            }, 51)
+        })
     }
 }
 
