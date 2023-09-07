@@ -15,14 +15,19 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     patches = db.relationship('Patch', back_populates='creator', lazy=True)
-    # favorite_patches = db.relationship('Patch', secondary=favorite_patch_association, back_populates='favorited_by', lazy=True)
+    favorite_patches = db.relationship('Patch', secondary=favorite_patch_association, back_populates='favorited_by', lazy=True)
 
-    def to_dict(self):
-        return {
+    def to_dict(self, include_patches=True):
+        user_dict = {
             "id": self.id,
             "name": self.name,
-            "patches": [patch.to_dict() for patch in self.patches]
+            "favorite_patches": [patch.to_dict() for patch in self.favorite_patches]
         }
+
+        if include_patches:
+            user_dict["patches"] = [patch.to_dict() for patch in self.patches]
+
+        return user_dict
 
 class Patch(db.Model):
     __tablename__ = "patches"
@@ -32,16 +37,23 @@ class Patch(db.Model):
     creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     creator = db.relationship('User', back_populates='patches')
     oscillators = db.relationship('Oscillator', back_populates='patch', lazy=True)
-    # favorited_by = db.relationship('User', secondary=favorite_patch_association, back_populates='favorite_patches', lazy=True)
+    favorited_by = db.relationship('User', secondary=favorite_patch_association, back_populates='favorite_patches', lazy=True)
 
-    def to_dict(self):
+    def to_dict(self, include_creator=True, include_fav=True):
 
-        return {
+        patch_dict =  {
             "id": self.id,
             "name": self.name,
-            "creator_id": self.creator_id,
-            "oscillators": [osc.to_dict() for osc in self.oscillators]
+            "oscillators": [osc.to_dict() for osc in self.oscillators],
         }
+
+        if include_creator:
+            patch_dict["creator"] = self.creator.to_dict(include_patches=False)
+
+        if include_fav:
+            patch_dict["favorited_by"] = [user.to_dict(include_fav=False) for user in self.favorited_by]
+
+        return patch_dict
 
 class Oscillator(db.Model):
     __tablename__ = "oscillators"
@@ -68,10 +80,6 @@ class Oscillator(db.Model):
             "sustain": self.sustain,
             "release": self.release,
         }
-
-# class Favorite(db.Model):
-#     __tablename__ = "favorites"
-#     id = db.Column(db.Integer, primary_key=True)
 
 if __name__ == '__main__':
     db.create_all()

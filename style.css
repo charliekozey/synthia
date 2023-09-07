@@ -1,10 +1,15 @@
 body {
-    background-image: url("/cynthia.png");
+    /* background-image: url("/cynthia.png"); */
     background-size: 200px;
     text-shadow: 1px 1px cyan;
     color: #333333;
+    font-family: "Andale Mono", monospace;
 }
 
 #save-status {
+    display: none;
+}
+
+#user-patch-header {
     display: none;
 }

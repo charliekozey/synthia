@@ -1,5 +1,6 @@
 // function todo() {
     // NOW DOING:
+        // social patch info
         // GET user favorites
         // user login
         // add new patch
@@ -23,10 +24,15 @@
         // stereo? spatial??
         // fix browser tab change bug (audio still plays)
         // arpeggiator
+        // localize key map
+        // user profiles
+        // filter global patches by user
+        // filter patches by type (pad, bass, arp, etc)
+        // patch descriptions?
 
     // REFACTOR: 
         // abstract out updateGain/updateRelease/updateAttack etc functions
-        
+
     // IDEAS:
         // target ed space? younger audience?
         // display held down keys in visual representation (qwerty? piano? both?)
@@ -60,34 +66,38 @@ const keyboard = {
 const audioContext = new AudioContext()
 const oscillators = []
 const switchUserButton = document.getElementById('switch-user-button')
-let userId = 49
+let userId = 59
 
-// fetch("http://localhost:4000/patches")
-// .then(res => res.json())
-// .then(data => initializePatchList(data))
+fetch("http://localhost:4000/patches")
+.then(res => res.json())
+.then(data => initializePatchList(data, "global"))
 
-fetch(`http://localhost:4000/users/49`)
+fetch(`http://localhost:4000/users/59`)
 .then(res =>res.json())
 .then(data => initializeUser(data))
+
+function clearDomNode(domNode) {
+    while (domNode.hasChildNodes()) {
+        domNode.removeChild(domNode.lastChild)
+    }
+}
 
 function initializeUser(user) {
     console.log(user)
     const userNameDisplay = document.getElementById('user-name-display')
+    const userPatchHeader = document.getElementById('user-patch-header')
     
     userNameDisplay.textContent = `logged in as ${user.name}`
+    userPatchHeader.style.display = "block"
 
-    initializePatchList(user.patches)
+    initializePatchList(user.patches, "user")
 }
 
-function initializePatchList(patches) {
+function initializePatchList(patches, source) {
     console.log(patches)
-    const patchBank = document.getElementById("patch-bank")
+    const patchBank = document.getElementById(`${source}-patch-bank`)
 
-    while (patchBank.hasChildNodes()) {
-        patchBank.removeChild(patchBank.lastChild)
-    }
-
-    console.log(patchBank)
+    clearDomNode(patchBank)
     
     if (patches.length > 0) {
         patches.forEach(patch => {
@@ -103,15 +113,24 @@ function initializePatchList(patches) {
         loadPatch(patches[0])
     } else {
         const noPatchMessage = document.createElement("div")
-        noPatchMessage.textContent = "No patches yet. Create one below!"
+        noPatchMessage.textContent = "No patches yet. Create one above!"
         patchBank.append(noPatchMessage)
     }
 }
 
 function loadPatch(patch) {
-    const patchTitle = document.getElementById("patch-title")
+    const patchInfo = document.getElementById("patch-info")
+    const patchName = document.createElement("h3")
+    const patchCreator = document.createElement("h5")
 
-    patchTitle.textContent = patch.name
+    clearDomNode(patchInfo)
+
+    patchInfo.append(patchName)
+    patchInfo.append(patchCreator)
+    patchCreator.style.fontStyle = "italic"
+
+    patchName.textContent = patch.name
+    patchCreator.textContent = `by ${patch.creator.name}`
 
     oscillators.length = 0
     
@@ -152,7 +171,7 @@ function startSound(e) {
 
     if(Object.keys(keyboard).includes(input) && !keyboard[input].down) {
         patchGainNode.gain.setValueAtTime(0.0000000001, audioContext.currentTime)
-        patchGainNode.gain.exponentialRampToValueAtTime(parseFloat(placeholderPatchGain) * 0.1, audioContext.currentTime + parseFloat(placeHolderAttackTime))
+        patchGainNode.gain.linearRampToValueAtTime(parseFloat(placeholderPatchGain) * 0.1, audioContext.currentTime + parseFloat(placeHolderAttackTime))
 
         oscillators.forEach(osc => {
             // const attackTime = logifyValue(osc.attack)

@@ -11,18 +11,22 @@
     <header id="header">
         <h1>welcome to ~ s y n t h i a ~</h1>
         <button id="switch-user-button">switch user</button>
-        <h2 id="user-name-display">playing as guest. create an account to save your favorite patches!</h2>
+        <h2 id="user-name-display">playing as guest. create an account to save your favorite patches</h2>
     </header>
     <h2>
-        use home row keys (the asdf row) to play
+        <pre>
+ ------------------------------------------------
+ black keys:      [w][e]  [t][y][u]   [o][p]
+ white keys:    [a][s][d][f][g][h][j][k][l][;][']
+ octave up/down: [z][x]
+ 
+ press escape to stop all sound
+ ------------------------------------------------
+        </pre>
     </h2>
-    <h2>
-        press escape to stop all sound
-    </h2>
-    <div id="patch-bank"></div>
     <div id="osc-bank">
         <div>
-            <h2 id="patch-title"></h2>
+            <h2 id="patch-info"></h2>
             <h2 id="save-status">****patch has unsaved changes****</h2>
             <em><span id="osc-name">Osc 1</span></em>
             <label htmlFor="type-select-1">wave:</label>
@@ -71,6 +75,15 @@
             <label htmlFor="release-slider-3">release:</label>
             <input id="release-slider-3" name="release-3" type="range" min=0.001 max=1 step=0.01></input>
         </div>
+    </div>
+    <h1 id="user-patch-header">user patch bank:</h1>
+    <div id="user-patch-bank">
+    </div>
+    <h1>your favorites:</h1>
+    <div id="fav-patch-bank">
+    </div>
+    <h1>global patch bank:</h1>
+    <div id="global-patch-bank">
     </div>
 
 </body>
