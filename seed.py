@@ -1,4 +1,4 @@
-from models import User, Patch, Favorite, Oscillator
+from models import User, Patch, Oscillator
 from decimal import Decimal
 from app import app
 from database import db
@@ -11,12 +11,15 @@ if __name__ == '__main__':
         Oscillator.query.delete()
         Patch.query.delete()
         User.query.delete()
-        # Favorite.query.delete()
 
         fake = Faker()
 
         print("🌱 Seeding Users...")
-        users = [User(name = "Naomi"), User(name="Jojo"), User(name="Katie")]
+        users = []
+        for i in range(10):
+            user = User(name=fake.username())
+            users.append(user)
+
         db.session.add_all(users)
         db.session.commit()
 
@@ -25,7 +28,7 @@ if __name__ == '__main__':
         osc_types = ["sine", "triangle", "square", "sawtooth"]
         for i in range(20):
             user = choice(users)
-            patch = Patch(name=fake.color_name(), user_id=user.id, oscillators=[])
+            patch = Patch(name=fake.color_name(), creator_id=user.id, oscillators=[])
             oscillator1 = Oscillator(
                     number=1, 
                     osc_type=choice(osc_types), 
@@ -63,8 +66,6 @@ if __name__ == '__main__':
         db.session.add_all(patches)
         db.session.commit()
         
-        # print("🌱 Seeding Favorites...")
-
         # print("🌱 Seeding Oscillators...")
 
 

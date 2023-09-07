@@ -1,7 +1,8 @@
 // function todo() {
     // NOW DOING:
-        // add new patch
+        // GET user favorites
         // user login
+        // add new patch
     
     // TODO:
         // remove unused gain node on note end
@@ -16,16 +17,16 @@
         // lfo
         // EQ/filters
         // microtonality?
-        // user login
         // beginner-friendly illustrations and self-guiding UI
         // sequencer
         // play more than 6 notes at a time?
         // stereo? spatial??
         // fix browser tab change bug (audio still plays)
         // arpeggiator
-        // record output
+
     // REFACTOR: 
         // abstract out updateGain/updateRelease/updateAttack etc functions
+        
     // IDEAS:
         // target ed space? younger audience?
         // display held down keys in visual representation (qwerty? piano? both?)
@@ -33,6 +34,7 @@
         // incorporate sequencer, etc
         // maybe similar target audience to hookpad
         // trackpad as xy manipulator for pitch, other params
+        // record output
 // }
 
 const keyboard = {
@@ -56,25 +58,54 @@ const keyboard = {
     "'": {freq: 698, down: false},
 }
 const audioContext = new AudioContext()
-// global oscillators array stores the state of oscillator objects
 const oscillators = []
-// global nodes array stores the state of OscillatorNodes and patchGainNodes (linked in pairs)
+const switchUserButton = document.getElementById('switch-user-button')
+let userId = 49
 
-fetch("http://localhost:4000/patches")
-.then(res => res.json())
-.then(data => initializePatchList(data))
+// fetch("http://localhost:4000/patches")
+// .then(res => res.json())
+// .then(data => initializePatchList(data))
 
-function initializePatchList(data) {
+fetch(`http://localhost:4000/users/49`)
+.then(res =>res.json())
+.then(data => initializeUser(data))
+
+function initializeUser(user) {
+    console.log(user)
+    const userNameDisplay = document.getElementById('user-name-display')
+    
+    userNameDisplay.textContent = `logged in as ${user.name}`
+
+    initializePatchList(user.patches)
+}
+
+function initializePatchList(patches) {
+    console.log(patches)
     const patchBank = document.getElementById("patch-bank")
-    data.forEach(patch => {
-        const patchItem = document.createElement("div")
-        patchItem.textContent = patch.name
-        patchBank.append(patchItem)
-        patchItem.addEventListener("click", e => {
-            loadPatch(patch)
-        })
-    })
-    loadPatch(data[0])
+
+    while (patchBank.hasChildNodes()) {
+        patchBank.removeChild(patchBank.lastChild)
+    }
+
+    console.log(patchBank)
+    
+    if (patches.length > 0) {
+        patches.forEach(patch => {
+            const patchItem = document.createElement("div")
+
+            patchBank.append(patchItem)
+            patchItem.textContent = patch.name
+            patchItem.addEventListener("click", e => {
+                loadPatch(patch)
+            })
+        })  
+
+        loadPatch(patches[0])
+    } else {
+        const noPatchMessage = document.createElement("div")
+        noPatchMessage.textContent = "No patches yet. Create one below!"
+        patchBank.append(noPatchMessage)
+    }
 }
 
 function loadPatch(patch) {
@@ -98,11 +129,19 @@ function loadPatch(patch) {
         
         oscillators.push(osc)
 
-        // console.log(osc.release + "=>" + logValue(osc.release))
+        // console.log(osc.release + "=>" + logifyValue(osc.release))
     })
 
 }
 
+function changeUser() {
+    userId ++
+
+    fetch(`http://localhost:4000/users/${userId}`)
+    .then(res =>res.json())
+    .then(data => initializeUser(data))
+}
+ 
 function startSound(e) {
     if (e.repeat) return
 
@@ -116,7 +155,7 @@ function startSound(e) {
         patchGainNode.gain.exponentialRampToValueAtTime(parseFloat(placeholderPatchGain) * 0.1, audioContext.currentTime + parseFloat(placeHolderAttackTime))
 
         oscillators.forEach(osc => {
-            // const attackTime = logValue(osc.attack)
+            // const attackTime = logifyValue(osc.attack)
             console.log(osc.number + " activating")
             const oscNode = new OscillatorNode(audioContext, {type: osc.osc_type, frequency: keyboard[input].freq})
             const oscGainNode = new GainNode(audioContext, {type: osc.gain, frequency: keyboard[input].freq})
@@ -156,7 +195,7 @@ function stopSound(patchGainNode, oscGainNode, oscNode, input, osc) {
     // console.log(patchGainNode)
     // console.log(oscNode)
     // console.log(audioContext)
-    const releaseTime = logValue(osc.release)
+    const releaseTime = logifyValue(osc.release)
     console.log(100*releaseTime)
     patchGainNode.gain.setValueAtTime(patchGainNode.gain.value, audioContext.currentTime)
     // node.gain_node.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.05)
@@ -224,9 +263,9 @@ function updateGain(e, gainToUpdate, oscId) {
 document.addEventListener("keydown", e => startSound(e))
 document.addEventListener("keydown",  e => changeOctave(e))
 document.addEventListener("keydown",  e => panic(e))
+switchUserButton.addEventListener("click", () => changeUser())
 
-
-function logValue(position) {
+function logifyValue(position) {
     const minInput = 0
     const maxInput = 100
 
@@ -238,14 +277,16 @@ function logValue(position) {
     return Math.exp(minValue + scale*(position-minInput))
 }
 
-// console.log("logValue(0.0) = ", logValue(0.0))
-// console.log("logValue(0.1) = ", logValue(0.1))
-// console.log("logValue(0.2) = ", logValue(0.2))
-// console.log("logValue(0.3) = ", logValue(0.3))
-// console.log("logValue(0.4) = ", logValue(0.4))
-// console.log("logValue(0.5) = ", logValue(0.5))
-// console.log("logValue(0.6) = ", logValue(0.6))
-// console.log("logValue(0.7) = ", logValue(0.7))
-// console.log("logValue(0.8) = ", logValue(0.8))
-// console.log("logValue(0.9) = ", logValue(0.9))
-// console.log("logValue(1.0) = ", logValue(1.0))
+// initializeUser(userId)
+
+// console.log("logifyValue(0.0) = ", logifyValue(0.0))
+// console.log("logifyValue(0.1) = ", logifyValue(0.1))
+// console.log("logifyValue(0.2) = ", logifyValue(0.2))
+// console.log("logifyValue(0.3) = ", logifyValue(0.3))
+// console.log("logifyValue(0.4) = ", logifyValue(0.4))
+// console.log("logifyValue(0.5) = ", logifyValue(0.5))
+// console.log("logifyValue(0.6) = ", logifyValue(0.6))
+// console.log("logifyValue(0.7) = ", logifyValue(0.7))
+// console.log("logifyValue(0.8) = ", logifyValue(0.8))
+// console.log("logifyValue(0.9) = ", logifyValue(0.9))
+// console.log("logifyValue(1.0) = ", logifyValue(1.0))

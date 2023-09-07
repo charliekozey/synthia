@@ -14,7 +14,7 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
-    patches = db.relationship('Patch', back_populates='user', lazy=True)
+    patches = db.relationship('Patch', back_populates='creator', lazy=True)
     # favorite_patches = db.relationship('Patch', secondary=favorite_patch_association, back_populates='favorited_by', lazy=True)
 
     def to_dict(self):
@@ -29,8 +29,8 @@ class Patch(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
-    user = db.relationship('User', back_populates='patches')
+    creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    creator = db.relationship('User', back_populates='patches')
     oscillators = db.relationship('Oscillator', back_populates='patch', lazy=True)
     # favorited_by = db.relationship('User', secondary=favorite_patch_association, back_populates='favorite_patches', lazy=True)
 
@@ -39,6 +39,7 @@ class Patch(db.Model):
         return {
             "id": self.id,
             "name": self.name,
+            "creator_id": self.creator_id,
             "oscillators": [osc.to_dict() for osc in self.oscillators]
         }
 
@@ -68,9 +69,9 @@ class Oscillator(db.Model):
             "release": self.release,
         }
 
-class Favorite(db.Model):
-    __tablename__ = "favorites"
-    id = db.Column(db.Integer, primary_key=True)
+# class Favorite(db.Model):
+#     __tablename__ = "favorites"
+#     id = db.Column(db.Integer, primary_key=True)
 
 if __name__ == '__main__':
     db.create_all()
