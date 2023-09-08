@@ -15,13 +15,13 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     patches = db.relationship('Patch', back_populates='creator', lazy=True)
-    favorite_patches = db.relationship('Patch', secondary="favorites", back_populates='favorited_by', lazy=True)
+    # favorite_patches = db.relationship('Patch', secondary="favorites", back_populates='favorited_by', lazy=True)
 
     def to_dict(self, include_patches=True):
         user_dict = {
             "id": self.id,
             "name": self.name,
-            "favorite_patches": [patch.to_dict() for patch in self.favorite_patches]
+            # "favorite_patches": [patch.to_dict() for patch in self.favorite_patches]
         }
 
         if include_patches:
@@ -37,7 +37,7 @@ class Patch(db.Model):
     creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     creator = db.relationship('User', back_populates='patches')
     oscillators = db.relationship('Oscillator', back_populates='patch', lazy=True)
-    favorited_by = db.relationship('User', secondary="favorites", back_populates='favorite_patches', lazy=True)
+    # favorited_by = db.relationship('User', secondary="favorites", back_populates='favorite_patches', lazy=True)
 
     def to_dict(self, include_creator=True, include_fav=True):
 
@@ -50,8 +50,8 @@ class Patch(db.Model):
         if include_creator:
             patch_dict["creator"] = self.creator.to_dict(include_patches=False)
 
-        if include_fav:
-            patch_dict["favorited_by"] = [user.to_dict(include_fav=False) for user in self.favorited_by]
+        # if include_fav:
+        #     patch_dict["favorited_by"] = [user.to_dict(include_fav=False) for user in self.favorited_by]
 
         return patch_dict
 

@@ -47,20 +47,32 @@ def index_patches():
     return make_response(jsonify(patch_dicts), 200)
 
 
-@app.patch('/oscillators/<id>')
-def update_oscillator(id):
-    params = request.get_json()
-    oscillator = Oscillator.query.get(id)
+@app.patch('/patches/<id>')
+def update_patch(id):
+    patch = Patch.query.get(id)
     data = request.json
 
-    if oscillator is None:
-        return jsonify({"message": "Patch not found"}), 404
-    if 'gain' in data:
-        oscillator.gain = data['gain']
+    print("\n")
+    print("\n")
+    print("\n")
+    print("\n")
+    print("\n")
+    print("\n")
+    print("\n")
+    print("\n")
+    print("\n")
+    print("\n")
+    print("\n")
+    print("THIS IS THE PATCH", patch)
+    print("THIS IS THE DATA", data)
 
+    # if patch is None:
+    #     return jsonify({"message": "Patch not found"}), 404
+        
+    Patch.query.where(Patch.id==id).update(data)
     db.session.commit()
+    return jsonify({"message": f"patch updated successfully"}), 200
 
-    return jsonify({"message": f"Oscillator {oscillator.number} of {oscillator.patch.name} updated to {data['gain']}"}), 200
 
 if __name__ == '__main__':
     app.run(port=4000, debug=True)

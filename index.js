@@ -1,80 +1,84 @@
 // function todo() {
-    // NOW DOING:
-        // social patch info
-        // GET user favorites
-        // user login
-        // add new patch
-    
-    // TODO:
-        // remove unused gain node on note end
-        // waveform manipulation (asdr) for individual oscillators
-        // gain sliders not working right; i think there's an extra node hanging out somewhere
-        // fix: behavior differs between click+slide vs. click on gain sliders
-        // update gitignore
-        // investigate beating
-        // ~ o s c i l l o s c o p e ~
-        // fix static on gain slider change
-        // effects
-        // lfo
-        // EQ/filters
-        // microtonality?
-        // beginner-friendly illustrations and self-guiding UI
-        // sequencer
-        // play more than 6 notes at a time?
-        // stereo? spatial??
-        // fix browser tab change bug (audio still plays)
-        // arpeggiator
-        // localize key map
-        // user profiles
-        // filter global patches by user
-        // filter patches by type (pad, bass, arp, etc)
-        // patch descriptions?
+// NOW DOING:
+// add new patch
 
-    // REFACTOR: 
-        // abstract out updateGain/updateRelease/updateAttack etc functions
+// TODO:
+// social patch info
+// GET user favorites
+// user login
+// remove unused gain node on note end
+// waveform manipulation (asdr) for individual oscillators
+// gain sliders not working right; i think there's an extra node hanging out somewhere
+// fix: behavior differs between click+slide vs. click on gain sliders
+// update gitignore
+// investigate beating
+// ~ o s c i l l o s c o p e ~
+// fix static on gain slider change
+// effects
+// lfo
+// EQ/filters
+// microtonality?
+// beginner-friendly illustrations and self-guiding UI
+// sequencer
+// play more than 6 notes at a time?
+// stereo? spatial??
+// fix browser tab change bug (audio still plays)
+// arpeggiator
+// localize key map
+// user profiles
+// filter global patches by user
+// filter patches by type (pad, bass, arp, etc)
+// patch descriptions?
 
-    // IDEAS:
-        // target ed space? younger audience?
-        // display held down keys in visual representation (qwerty? piano? both?)
-        // calculate chord from held notes and display it
-        // incorporate sequencer, etc
-        // maybe similar target audience to hookpad
-        // trackpad as xy manipulator for pitch, other params
-        // record output
+// REFACTOR: 
+// abstract out updateGain/updateRelease/updateAttack etc functions
+
+// IDEAS:
+// target ed space? younger audience?
+// display held down keys in visual representation (qwerty? piano? both?)
+// calculate chord from held notes and display it
+// incorporate sequencer, etc
+// maybe similar target audience to hookpad
+// trackpad as xy manipulator for pitch, other params
+// record output
 // }
 
 const keyboard = {
-    "a": {freq: 262, down: false}, 
-    "w": {freq: 277, down: false}, 
-    "s": {freq: 294, down: false}, 
-    "e": {freq: 311, down: false}, 
-    "d": {freq: 330, down: false}, 
-    "f": {freq: 349, down: false}, 
-    "t": {freq: 370, down: false},
-    "g": {freq: 392, down: false}, 
-    "y": {freq: 415, down: false}, 
-    "h": {freq: 440, down: false}, 
-    "u": {freq: 466, down: false}, 
-    "j": {freq: 494, down: false}, 
-    "k": {freq: 523, down: false}, 
-    "o": {freq: 554, down: false}, 
-    "l": {freq: 587, down: false}, 
-    "p": {freq: 622, down: false}, 
-    ";": {freq: 659, down: false}, 
-    "'": {freq: 698, down: false},
+    "a": { freq: 262, down: false },
+    "w": { freq: 277, down: false },
+    "s": { freq: 294, down: false },
+    "e": { freq: 311, down: false },
+    "d": { freq: 330, down: false },
+    "f": { freq: 349, down: false },
+    "t": { freq: 370, down: false },
+    "g": { freq: 392, down: false },
+    "y": { freq: 415, down: false },
+    "h": { freq: 440, down: false },
+    "u": { freq: 466, down: false },
+    "j": { freq: 494, down: false },
+    "k": { freq: 523, down: false },
+    "o": { freq: 554, down: false },
+    "l": { freq: 587, down: false },
+    "p": { freq: 622, down: false },
+    ";": { freq: 659, down: false },
+    "'": { freq: 698, down: false },
 }
 const audioContext = new AudioContext()
 const oscillators = []
 const switchUserButton = document.getElementById('switch-user-button')
-let userId = 59
+const addPatchButton = document.getElementById("new-patch-button")
+const savePatchButton = document.getElementById("save-patch-button")
+let userId = 1
+let userState = {}
+let patchState = {}
 
 fetch("http://localhost:4000/patches")
-.then(res => res.json())
-.then(data => initializePatchList(data, "global"))
+    .then(res => res.json())
+    .then(data => initializePatchList(data, "global"))
 
-fetch(`http://localhost:4000/users/59`)
-.then(res =>res.json())
-.then(data => initializeUser(data))
+fetch(`http://localhost:4000/users/1`)
+    .then(res => res.json())
+    .then(data => initializeUser(data))
 
 function clearDomNode(domNode) {
     while (domNode.hasChildNodes()) {
@@ -82,15 +86,16 @@ function clearDomNode(domNode) {
     }
 }
 
-function initializeUser(user) {
-    console.log(user)
+function initializeUser(user_data) {
     const userNameDisplay = document.getElementById('user-name-display')
     const userPatchHeader = document.getElementById('user-patch-header')
     
-    userNameDisplay.textContent = `logged in as ${user.name}`
+    userState = user_data
+    console.log("USER STATE:", userState)
+    userNameDisplay.textContent = `logged in as ${user_data.name}`
     userPatchHeader.style.display = "block"
 
-    initializePatchList(user.patches, "user")
+    initializePatchList(user_data.patches, "user")
 }
 
 function initializePatchList(patches, source) {
@@ -98,7 +103,7 @@ function initializePatchList(patches, source) {
     const patchBank = document.getElementById(`${source}-patch-bank`)
 
     clearDomNode(patchBank)
-    
+
     if (patches.length > 0) {
         patches.forEach(patch => {
             const patchItem = document.createElement("div")
@@ -108,7 +113,7 @@ function initializePatchList(patches, source) {
             patchItem.addEventListener("click", e => {
                 loadPatch(patch)
             })
-        })  
+        })
 
         loadPatch(patches[0])
     } else {
@@ -122,18 +127,25 @@ function loadPatch(patch) {
     const patchInfo = document.getElementById("patch-info")
     const patchName = document.createElement("h3")
     const patchCreator = document.createElement("h5")
+    // const editPatchNameButton = document.createElement("button")
 
     clearDomNode(patchInfo)
 
     patchInfo.append(patchName)
+    // patchInfo.append(editPatchNameButton)
     patchInfo.append(patchCreator)
     patchCreator.style.fontStyle = "italic"
 
     patchName.textContent = patch.name
     patchCreator.textContent = `by ${patch.creator.name}`
+    // editPatchNameButton.textContent = "edit patch name"
+
+    // editPatchNameButton.addEventListener("click", (e) => {
+    //     editPatchName(e, patchName)
+    // })
 
     oscillators.length = 0
-    
+
     patch.oscillators.forEach(osc => {
         const typeSelect = document.getElementById(`type-select-${osc.number}`)
         const gainSlider = document.getElementById(`gain-slider-${osc.number}`)
@@ -144,40 +156,43 @@ function loadPatch(patch) {
         attackSlider.value = osc.attack
         releaseSlider.value = osc.release
 
-        gainSlider.addEventListener("input", e => updateGain(e, osc.gain, osc.id))
-        
+        gainSlider.addEventListener("input", e => updateGain(e, osc))
+
         oscillators.push(osc)
 
         // console.log(osc.release + "=>" + logifyValue(osc.release))
     })
 
+    toggleSaveButton(true)
+    patchState = patch
+    console.log("PATCH STATE", patchState)
 }
 
 function changeUser() {
-    userId ++
+    userId++
 
     fetch(`http://localhost:4000/users/${userId}`)
-    .then(res =>res.json())
-    .then(data => initializeUser(data))
+        .then(res => res.json())
+        .then(data => initializeUser(data))
 }
- 
+
 function startSound(e) {
     if (e.repeat) return
 
     const input = e.key
     const placeholderPatchGain = 0.5
-    const patchGainNode = new GainNode(audioContext, { gain: parseFloat(placeholderPatchGain)})
+    const patchGainNode = new GainNode(audioContext, { gain: parseFloat(placeholderPatchGain) })
     const placeHolderAttackTime = 0.5
 
-    if(Object.keys(keyboard).includes(input) && !keyboard[input].down) {
+    if (Object.keys(keyboard).includes(input) && !keyboard[input].down) {
         patchGainNode.gain.setValueAtTime(0.0000000001, audioContext.currentTime)
         patchGainNode.gain.linearRampToValueAtTime(parseFloat(placeholderPatchGain) * 0.1, audioContext.currentTime + parseFloat(placeHolderAttackTime))
 
         oscillators.forEach(osc => {
             // const attackTime = logifyValue(osc.attack)
             console.log(osc.number + " activating")
-            const oscNode = new OscillatorNode(audioContext, {type: osc.osc_type, frequency: keyboard[input].freq})
-            const oscGainNode = new GainNode(audioContext, {type: osc.gain, frequency: keyboard[input].freq})
+            const oscNode = new OscillatorNode(audioContext, { type: osc.osc_type, frequency: keyboard[input].freq })
+            const oscGainNode = new GainNode(audioContext, { type: osc.gain, frequency: keyboard[input].freq })
             const typeSelect = document.getElementById(`type-select-${osc.number}`)
             const gainSlider = document.getElementById(`gain-slider-${osc.number}`)
             const releaseSlider = document.getElementById(`release-slider-${osc.number}`)
@@ -215,7 +230,7 @@ function stopSound(patchGainNode, oscGainNode, oscNode, input, osc) {
     // console.log(oscNode)
     // console.log(audioContext)
     const releaseTime = logifyValue(osc.release)
-    console.log(100*releaseTime)
+    console.log(100 * releaseTime)
     patchGainNode.gain.setValueAtTime(patchGainNode.gain.value, audioContext.currentTime)
     // node.gain_node.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.05)
     patchGainNode.gain.exponentialRampToValueAtTime(0.0000000001, audioContext.currentTime + parseFloat(releaseTime) * 10)
@@ -244,7 +259,7 @@ function changeOctave(e) {
 }
 
 function panic(e) {
-    if (e.key == "Escape"){
+    if (e.key == "Escape") {
         nodes.forEach(node => {
             console.log("stopping node")
             node.gain_node.gain.setValueAtTime(node.gain_node.gain.value, audioContext.currentTime)
@@ -258,31 +273,109 @@ function panic(e) {
     }
 }
 
-function updateGain(e, gainToUpdate, oscId) {
-    // const saveStatus = document.getElementById("save-status")
-    // saveStatus.style.display = "block"
-    console.log(oscId)
-    console.log("updating gain")
-    console.log(e)
-    gainToUpdate = parseFloat(e.target.value)
-    console.log(gainToUpdate)
+function updateGain(e, editedOsc) {
+    toggleSaveButton(false)
+    // console.log(oscId)
+    // console.log("updating gain")
+    // console.log(e)
+    const gainToUpdate = parseFloat(e.target.value)
+    // console.log(gainToUpdate)
 
-    fetch(`http://localhost:4000/oscillators/${oscId}`, {
-        method: "PATCH",
-        headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        },
-        body: JSON.stringify({gain: gainToUpdate})
+    patchState.oscillators.forEach(osc => {
+        if (parseFloat(osc.number) === editedOsc.number) {
+            osc.gain = gainToUpdate
+        }
     })
-        .then(res => res.json())
-        .then(data => console.log(data.message))
+
+    console.log("PATCH STATE AFTER GAIN UPDATE:", patchState)
+}
+
+function addNewPatch() {
+    const newPatch = {
+        "creator": {
+            "id": userState.id,
+            "name": userState.name
+        },
+        "name": "new patch",
+        "oscillators": [
+            {
+                "attack": 0.2,
+                "decay": 0.2,
+                "gain": 0.2,
+                "id": 1,
+                "number": 1,
+                "osc_type": "sine",
+                "release": 0.2,
+                "sustain":0.2
+            },
+            {
+                "attack": 0.2,
+                "decay": 0.2,
+                "gain": 0.2,
+                "id": 2,
+                "number": 2,
+                "osc_type": "sine",
+                "release": 0.2,
+                "sustain": 0.2
+            },
+            {
+                "attack": 0.2,
+                "decay": 0.2,
+                "gain": 0.2,
+                "id": 3,
+                "number": 3,
+                "osc_type": "sine",
+                "release": 0.2,
+                "sustain": 0.2
+            }
+        ]
+    }
+
+    loadPatch(newPatch)
+}
+
+function savePatch(e, patchState) {
+    toggleSaveButton(true)
+
+    fetch(`http://localhost:4000/patches/${patchState.id}`, {
+        method: 'POST',
+        // headers: {
+        //     "Content-Type": "application/json",
+        //     "Accept": "application/json"
+        // },
+        body: JSON.stringify(patchState)
+    })
+
+} 
+
+function editPatchName(e, patchName) {
+    const editField = document.createElement("input")
+
+    editField.type = "text"
+    editField.placeholder = patchName.textContent
+
+    patchName.after(editField)
+    patchName.style.display = "none"
+}
+
+function toggleSaveButton(saved) {
+    if (saved) {
+        savePatchButton.style.backgroundColor = "slateGray"
+        savePatchButton.style.pointerEvents = "none"
+        savePatchButton.textContent = "patch saved!"
+    } else {
+        savePatchButton.style.removeProperty("background-color")
+        savePatchButton.style.removeProperty("pointer-events")
+        savePatchButton.textContent = "save settings"
+    }
 }
 
 document.addEventListener("keydown", e => startSound(e))
-document.addEventListener("keydown",  e => changeOctave(e))
-document.addEventListener("keydown",  e => panic(e))
+document.addEventListener("keydown", e => changeOctave(e))
+document.addEventListener("keydown", e => panic(e))
 switchUserButton.addEventListener("click", () => changeUser())
+addPatchButton.addEventListener("click", () => addNewPatch())
+savePatchButton.addEventListener("click", (e) => savePatch(e, patchState))
 
 function logifyValue(position) {
     const minInput = 0
@@ -293,7 +386,7 @@ function logifyValue(position) {
 
     const scale = (maxInput - minInput) / (maxValue - minValue)
 
-    return Math.exp(minValue + scale*(position-minInput))
+    return Math.exp(minValue + scale * (position - minInput))
 }
 
 // initializeUser(userId)

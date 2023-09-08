@@ -26,9 +26,9 @@
     </h2>
     <div id="osc-bank">
         <div>
-            <h2 id="patch-info"></h2>
-            <h2 id="save-status">****patch has unsaved changes****</h2>
-            <em><span id="osc-name">Osc 1</span></em>
+            <h2 id="patch-info">
+            </h2>
+            <em><div id="osc-name">Osc 1</div></em>
             <label htmlFor="type-select-1">wave:</label>
             <select id="type-select-1" name="type-1">
               <option value="sine">sine</option>
@@ -44,7 +44,7 @@
             <input id="release-slider-1" name="release-1" type="range" min=0.001 max=1 step=0.01></input>
         </div>
         <div>
-            <em><span id="osc-name">Osc 2</span></em>
+            <em><div id="osc-name">Osc 2</div></em>
             <label htmlFor="type-select-2">wave:</label>
             <select id="type-select-2" name="type-2">
                 <option value="sine">sine</option>
@@ -60,7 +60,7 @@
             <input id="release-slider-2" name="release-2" type="range" min=0.001 max=1 step=0.01></input>
         </div>
         <div>
-            <em><span id="osc-name">Osc 3</span></em>
+            <em><div id="osc-name">Osc 3</div></em>
             <label htmlFor="type-select-3">wave:</label>
             <select id="type-select-3" name="type-3">
                 <option value="sine">sine</option>
@@ -75,8 +75,10 @@
             <label htmlFor="release-slider-3">release:</label>
             <input id="release-slider-3" name="release-3" type="range" min=0.001 max=1 step=0.01></input>
         </div>
+        <button id="save-patch-button">save patch</button>
     </div>
     <h1 id="user-patch-header">user patch bank:</h1>
+    <button id="new-patch-button">+ new patch</button>
     <div id="user-patch-bank">
     </div>
     <h1>your favorites:</h1>
