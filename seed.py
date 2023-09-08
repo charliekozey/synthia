@@ -1,4 +1,4 @@
-from models import User, Patch, Oscillator, favorite_patch_association
+from models import User, Patch, Oscillator
 from decimal import Decimal
 from app import app
 from database import db
@@ -14,7 +14,7 @@ if __name__ == '__main__':
         Oscillator.query.delete()
         Patch.query.delete()
         User.query.delete()
-        db.session.execute(favorite_patch_association.delete()) 
+        # db.session.execute(favorite_patch_association.delete()) 
 
         print("🌱 Seeding Users...")
         users = []
@@ -65,10 +65,10 @@ if __name__ == '__main__':
         db.session.add_all(patches)
         db.session.commit()
         
-        print("🌱 Seeding Favorites...")
-        for user in users:
-            # Choose a random patch for each user as a favorite
-            favorite_patch = choice(patches)
-            user.favorite_patches.append(favorite_patch)
+        # print("🌱 Seeding Favorites...")
+        # for user in users:
+        #     # Choose a random patch for each user as a favorite
+        #     favorite_patch = choice(patches)
+        #     user.favorite_patches.append(favorite_patch)
 
         print("Done seeding!")

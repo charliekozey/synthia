@@ -15,7 +15,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     patches = db.relationship('Patch', back_populates='creator', lazy=True)
-    favorite_patches = db.relationship('Patch', secondary=favorite_patch_association, back_populates='favorited_by', lazy=True)
+    favorite_patches = db.relationship('Patch', secondary="favorites", back_populates='favorited_by', lazy=True)
 
     def to_dict(self, include_patches=True):
         user_dict = {
@@ -37,7 +37,7 @@ class Patch(db.Model):
     creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     creator = db.relationship('User', back_populates='patches')
     oscillators = db.relationship('Oscillator', back_populates='patch', lazy=True)
-    favorited_by = db.relationship('User', secondary=favorite_patch_association, back_populates='favorite_patches', lazy=True)
+    favorited_by = db.relationship('User', secondary="favorites", back_populates='favorite_patches', lazy=True)
 
     def to_dict(self, include_creator=True, include_fav=True):
 

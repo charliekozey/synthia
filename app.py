@@ -8,7 +8,7 @@ from database import db
 app = Flask(__name__)
 CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/synthia-db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/new-synthia'
 
 migrate = Migrate(app, db)
 
