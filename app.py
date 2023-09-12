@@ -50,26 +50,46 @@ def index_patches():
 @app.patch('/patches/<id>')
 def update_patch(id):
     patch = Patch.query.get(id)
-    data = request.json
 
-    print("\n")
-    print("\n")
-    print("\n")
-    print("\n")
-    print("\n")
-    print("\n")
-    print("\n")
-    print("\n")
-    print("\n")
-    print("\n")
-    print("\n")
-    print("THIS IS THE PATCH", patch)
-    print("THIS IS THE DATA", data)
+    if patch is None:
+        return jsonify({"message": "Patch not found"}), 404
 
-    # if patch is None:
-    #     return jsonify({"message": "Patch not found"}), 404
-        
-    Patch.query.where(Patch.id==id).update(data)
+    data = request.get_json()
+
+    def update_oscillator(osc):
+        oscillator = Oscillator.query.get(osc['id'])
+        oscillator.type = osc['osc_type']
+        oscillator.gain = osc['gain']
+        oscillator.attack = osc['attack']
+        oscillator.decay = osc['decay']
+        oscillator.sustain = osc['sustain']
+        oscillator.release = osc['release']
+
+        db.session.add(oscillator)
+        db.session.commit()
+
+        print("\n")
+        print("\n")
+        print("\n")
+        print("\n")
+        print("\n")
+        print("\n")
+        print("THIS IS THE OSC", oscillator)
+        print("\n")
+        print("\n")
+        print("\n")
+        print("\n")
+        print("\n")
+        print("\n")
+
+    if 'name' in data:
+        patch.name = data['name']
+    if 'oscillators' in data:
+        for osc in data['oscillators']:
+            update_oscillator(osc)
+            # db.session.commit()
+
+    # patch.update(data)
     db.session.commit()
     return jsonify({"message": f"patch updated successfully"}), 200
 

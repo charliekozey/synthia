@@ -1,8 +1,9 @@
 // function todo() {
 // NOW DOING:
-// add new patch
+// save patch settings (now just oscillator data back end)
 
 // TODO:
+// add new patch
 // social patch info
 // GET user favorites
 // user login
@@ -147,7 +148,7 @@ function loadPatch(patch) {
     oscillators.length = 0
 
     patch.oscillators.forEach(osc => {
-        const typeSelect = document.getElementById(`type-select-${osc.number}`)
+        const typeSelect = document.getElementById(`osc_type-select-${osc.number}`)
         const gainSlider = document.getElementById(`gain-slider-${osc.number}`)
         const attackSlider = document.getElementById(`attack-slider-${osc.number}`)
         const releaseSlider = document.getElementById(`release-slider-${osc.number}`)
@@ -156,7 +157,10 @@ function loadPatch(patch) {
         attackSlider.value = osc.attack
         releaseSlider.value = osc.release
 
-        gainSlider.addEventListener("input", e => updateGain(e, osc))
+        typeSelect.addEventListener("input", e => updateValue(e, osc))
+        gainSlider.addEventListener("input", e => updateValue(e, osc))
+        attackSlider.addEventListener("input", e => updateValue(e, osc))
+        releaseSlider.addEventListener("input", e => updateValue(e, osc))
 
         oscillators.push(osc)
 
@@ -193,7 +197,7 @@ function startSound(e) {
             console.log(osc.number + " activating")
             const oscNode = new OscillatorNode(audioContext, { type: osc.osc_type, frequency: keyboard[input].freq })
             const oscGainNode = new GainNode(audioContext, { type: osc.gain, frequency: keyboard[input].freq })
-            const typeSelect = document.getElementById(`type-select-${osc.number}`)
+            const typeSelect = document.getElementById(`osc_type-select-${osc.number}`)
             const gainSlider = document.getElementById(`gain-slider-${osc.number}`)
             const releaseSlider = document.getElementById(`release-slider-${osc.number}`)
             const attackSlider = document.getElementById(`attack-slider-${osc.number}`)
@@ -273,21 +277,25 @@ function panic(e) {
     }
 }
 
-function updateGain(e, editedOsc) {
+function updateValue(e, editedOsc) {
     toggleSaveButton(false)
-    // console.log(oscId)
-    // console.log("updating gain")
-    // console.log(e)
-    const gainToUpdate = parseFloat(e.target.value)
-    // console.log(gainToUpdate)
+
+    const updatedValue = e.target.name === `osc_type-${editedOsc.number}` ?
+        e.target.value
+        :
+        parseFloat(e.target.value) 
+    const slicedName = e.target.name.slice(0, -2)
+
+    // console.log(e.target.name, ":", updatedValue)
 
     patchState.oscillators.forEach(osc => {
         if (parseFloat(osc.number) === editedOsc.number) {
-            osc.gain = gainToUpdate
+            osc[slicedName] = updatedValue
+            console.log(slicedName, osc[slicedName])
         }
     })
 
-    console.log("PATCH STATE AFTER GAIN UPDATE:", patchState)
+    console.log("PATCH STATE AFTER UPDATE:", patchState)
 }
 
 function addNewPatch() {
@@ -338,11 +346,11 @@ function savePatch(e, patchState) {
     toggleSaveButton(true)
 
     fetch(`http://localhost:4000/patches/${patchState.id}`, {
-        method: 'POST',
-        // headers: {
-        //     "Content-Type": "application/json",
-        //     "Accept": "application/json"
-        // },
+        method: 'PATCH',
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
         body: JSON.stringify(patchState)
     })
 
