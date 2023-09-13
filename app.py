@@ -32,12 +32,14 @@ def index_users():
     # return ""
     return make_response(jsonify(user_dicts), 200)
 
+
 @app.get('/users/<id>')
 def show_user(id):
     user = User.query.get(id)
     user_dict = user.to_dict()
 
     return make_response(jsonify(user_dict), 200)
+
 
 @app.get('/patches')
 def index_patches():

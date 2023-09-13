@@ -12,19 +12,14 @@
 // gain sliders not working right; i think there's an extra node hanging out somewhere
 // fix: behavior differs between click+slide vs. click on gain sliders
 // update gitignore
-// investigate beating
-// ~ o s c i l l o s c o p e ~
 // fix static on gain slider change
 // effects
 // lfo
 // EQ/filters
-// microtonality?
 // beginner-friendly illustrations and self-guiding UI
 // sequencer
 // play more than 6 notes at a time?
-// stereo? spatial??
 // fix browser tab change bug (audio still plays)
-// arpeggiator
 // localize key map
 // user profiles
 // filter global patches by user
@@ -39,9 +34,16 @@
 // display held down keys in visual representation (qwerty? piano? both?)
 // calculate chord from held notes and display it
 // incorporate sequencer, etc
-// maybe similar target audience to hookpad
+// maybe similar target audience to hookpad?
 // trackpad as xy manipulator for pitch, other params
 // record output
+// investigate beating
+// ~ o s c i l l o s c o p e ~
+// microtonality?
+// stereo? spatial??
+// arpeggiator
+// import/export midi
+// external controller support
 // }
 
 const keyboard = {
