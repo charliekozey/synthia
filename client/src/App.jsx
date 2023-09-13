@@ -84,10 +84,12 @@ function App() {
   }, [])
 
   useEffect(() => {
-    document.addEventListener("keydown", e => startSound(e))
+    document.addEventListener("keydown", e => {
+      if (Object.keys(keyboard).includes(e.key)) startSound(e)
+      if (e.key === "Escape") panic(e)
+      if (e.key === "x" || e.key === "z") changeOctave(e)
+    })
     document.addEventListener("keyup", e => stopSound(e))
-    document.addEventListener("keydown", e => changeOctave(e))
-    document.addEventListener("keydown", e => panic(e))
     console.log("you may play now")
   }, [loadedPatch])
 
@@ -120,7 +122,7 @@ function App() {
     if (e.repeat) return
     const input = e.key
 
-    if (!!loadedPatch && Object.keys(keyboard).includes(input) && !keyboard[input].down) {
+    if (!!loadedPatch && !keyboard[input].down) {
       loadedPatch.oscillators.forEach(osc => {
         const attackTime = logValue(osc.attack)
         console.log(osc.number + " activating")
@@ -159,10 +161,10 @@ function App() {
   }
 
   function stopSound(e) {
-    console.log("stopping sound")
+    
     const input = e.key
-
     if (Object.keys(keyboard).includes(input)) {
+      console.log("stopping sound")
 
       nodes.forEach(node => {
         const releaseTime = logValue(node.osc_data.release)
@@ -199,7 +201,6 @@ function App() {
   }
 
   function panic(e) {
-    if (e.key == "Escape") {
       nodes.forEach(node => {
         console.log("stopping node")
         node.gain_node.gain.setValueAtTime(node.gain_node.gain.value, audioContext.currentTime)
@@ -210,7 +211,6 @@ function App() {
           node.osc_node.disconnect()
         }, 51)
       })
-    }
   }
 
   function updateGain(e, gainToUpdate, oscId) {

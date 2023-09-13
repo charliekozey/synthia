@@ -2,16 +2,13 @@ from flask import Flask, make_response, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
-from models import User, Patch, Favorite, Oscillator
+from models import User, Patch, Oscillator
 from database import db
 
 app = Flask(__name__)
-CORS(app, resources={
-    r"/oscillators/*": {"origins": "http://127.0.0.1:5500"},
-    r"/patches/*": {"origins": "http://127.0.0.1:5500"}
-})
+CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/synthia-db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/new-synthia'
 
 migrate = Migrate(app, db)
 
