@@ -42,7 +42,7 @@
 // trackpad as xy manipulator for pitch, other params
 // }
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import PatchBank from './PatchBank'
 import OscillatorContainer from './OscillatorContainer'
 import './App.css'
@@ -51,9 +51,9 @@ function App() {
   const [oscillators, setOscillators] = useState([])
   const [nodes, setNodes] = useState([])
   const [patchList, setPatchList] = useState([])
-  const [loadedPatch, setLoadedPatch] = useState()
   const audioContext = new AudioContext()
-  const keyboard = {
+  const loadedPatch = useRef({})
+  const keyboard = useRef({
     "a": { freq: 262, down: false },
     "w": { freq: 277, down: false },
     "s": { freq: 294, down: false },
@@ -72,26 +72,36 @@ function App() {
     "p": { freq: 622, down: false },
     ";": { freq: 659, down: false },
     "'": { freq: 698, down: false },
-  }
+  })
+
+  console.log(keyboard.current)
 
   useEffect(() => {
     fetch("http://localhost:4000/patches")
       .then(res => res.json())
       .then(data => {
         setPatchList(data)
-        setLoadedPatch(data[0])
+        loadedPatch.current = data[0]
       })
   }, [])
 
   useEffect(() => {
+    document.removeEventListener("keydown", e => {
+      if (Object.keys(keyboard.current).includes(e.key)) startSound(e)
+      if (e.key === "Escape") panic(e)
+      if (e.key === "x" || e.key === "z") changeOctave(e)
+    })
+    document.removeEventListener("keyup", e => stopSound(e))
+
     document.addEventListener("keydown", e => {
-      if (Object.keys(keyboard).includes(e.key)) startSound(e)
+      if (Object.keys(keyboard.current).includes(e.key)) startSound(e)
       if (e.key === "Escape") panic(e)
       if (e.key === "x" || e.key === "z") changeOctave(e)
     })
     document.addEventListener("keyup", e => stopSound(e))
-    console.log("you may play now")
+    console.log("keyup and keydown listener added")
   }, [loadedPatch])
+  // }, [loadedPatch]) (why did I have this here????)
 
   // function loadPatch(patch) {
   //   const patchTitle = document.getElementById("patch-title")
@@ -113,7 +123,7 @@ function App() {
 
   //       oscillators.push(osc)
 
-  //       console.log(osc.release + "=>" + logValue(osc.release))
+  //       console.log(osc.release + "=>" + logifyValue(osc.release))
   //   })
 
   // }
@@ -122,11 +132,11 @@ function App() {
     if (e.repeat) return
     const input = e.key
 
-    if (!!loadedPatch && !keyboard[input].down) {
+    if (!!loadedPatch && !keyboard.current[input].down) {
       loadedPatch.oscillators.forEach(osc => {
-        const attackTime = logValue(osc.attack)
+        const attackTime = logifyValue(osc.attack)
         console.log(osc.number + " activating")
-        const oscNode = new OscillatorNode(audioContext, {type: osc.osc_type, frequency: keyboard[input].freq})
+        const oscNode = new OscillatorNode(audioContext, {type: osc.osc_type, frequency: keyboard.current[input].freq})
         const gainNode = new GainNode(audioContext, { gain: parseFloat(osc.gain)})
         const typeSelect = document.getElementById(`type-select-${osc.number}`)
         const gainSlider = document.getElementById(`gain-slider-${osc.number}`)
@@ -142,7 +152,7 @@ function App() {
         // gainNode.gain.value = (parseFloat(osc.gain) * 0.01)
         gainNode.gain.setValueAtTime(0.0000000001, audioContext.currentTime)
         // node.gain_node.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.05)
-        gainNode.gain.exponentialRampToValueAtTime(parseFloat(osc.gain) * 0.1, audioContext.currentTime + parseFloat(attackTime * 0.1))
+        gainNode.gain.linearRampToValueAtTime(parseFloat(osc.gain) * 0.1, audioContext.currentTime + parseFloat(attackTime) * 0.1)
         gainNode.connect(audioContext.destination)
         oscNode.start()
 
@@ -156,18 +166,20 @@ function App() {
         setNodes(nodes => [...nodes, newNode])
       })
 
-      keyboard[input].down = true
+      keyboard.current[input].down = true
     }
   }
 
   function stopSound(e) {
-    
+
     const input = e.key
-    if (Object.keys(keyboard).includes(input)) {
+    console.log("key down?", keyboard.current[input].down)
+    
+    if (Object.keys(keyboard.current).includes(input)) {
       console.log("stopping sound")
 
       nodes.forEach(node => {
-        const releaseTime = logValue(node.osc_data.release)
+        const releaseTime = logifyValue(node.osc_data.release)
 
         if (node.key_pressed == input) {
           node.gain_node.gain.setValueAtTime(node.gain_node.gain.value, audioContext.currentTime)
@@ -180,7 +192,7 @@ function App() {
           }, 51)
         }
       })
-      keyboard[input].down = false
+      keyboard.current[input].down = false
     }
     // setTimeout(() => {
     //     nodes.length = 0
@@ -189,12 +201,12 @@ function App() {
   }
 
   function changeOctave(e) {
-    for (const note in keyboard) {
+    for (const note in keyboard.current) {
       if (e.key == "z") {
-        keyboard[note].freq = keyboard[note].freq / 2
+        keyboard.current[note].freq = keyboard.current[note].freq / 2
       }
       if (e.key == "x") {
-        keyboard[note].freq = keyboard[note].freq * 2
+        keyboard.current[note].freq = keyboard.current[note].freq * 2
       }
     }
 
@@ -204,7 +216,7 @@ function App() {
       nodes.forEach(node => {
         console.log("stopping node")
         node.gain_node.gain.setValueAtTime(node.gain_node.gain.value, audioContext.currentTime)
-        node.gain_node.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.002)
+        node.gain_node.gain.linearRampToValueAtTime(0.00001, audioContext.currentTime + 0.002)
 
         setTimeout(() => {
           node.gain_node.disconnect()
@@ -234,17 +246,29 @@ function App() {
       .then(data => console.log(data.message))
   }
 
-  function logValue(position) {
+  function logifyValue(position) {
     const minInput = 0
     const maxInput = 100
 
     const minValue = Math.log(1)
-    const maxValue = Math.log(1000000000)
+    const maxValue = Math.log(10000000000000000000)
 
     const scale = (maxInput - minInput) / (maxValue - minValue)
 
     return Math.exp(minValue + scale * (position - minInput))
   }
+
+  // console.log("logifyValue(0.0) = ", logifyValue(0.0))
+  // console.log("logifyValue(0.1) = ", logifyValue(0.1))
+  // console.log("logifyValue(0.2) = ", logifyValue(0.2))
+  // console.log("logifyValue(0.3) = ", logifyValue(0.3))
+  // console.log("logifyValue(0.4) = ", logifyValue(0.4))
+  // console.log("logifyValue(0.5) = ", logifyValue(0.5))
+  // console.log("logifyValue(0.6) = ", logifyValue(0.6))
+  // console.log("logifyValue(0.7) = ", logifyValue(0.7))
+  // console.log("logifyValue(0.8) = ", logifyValue(0.8))
+  // console.log("logifyValue(0.9) = ", logifyValue(0.9))
+  // console.log("logifyValue(1.0) = ", logifyValue(1.0))
 
   return (
     <div>
@@ -257,8 +281,8 @@ function App() {
       <h2>
         press escape to stop all sound
       </h2>
-      <PatchBank patchList={patchList} setPatchList={setPatchList} setLoadedPatch={setLoadedPatch} />
-      {loadedPatch && <OscillatorContainer loadedPatch={loadedPatch} setLoadedPatch={setLoadedPatch} />}
+      <PatchBank patchList={patchList} setPatchList={setPatchList} loadedPatch={loadedPatch} />
+      {loadedPatch && <OscillatorContainer loadedPatch={loadedPatch} />}
     </div>
   )
 }

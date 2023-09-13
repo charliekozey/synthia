@@ -1,13 +1,12 @@
 import { useState } from 'react'
 import Oscillator from './Oscillator'
 
-function OscillatorContainer({ loadedPatch, setLoadedPatch }) {
-    const oscList = loadedPatch.oscillators.map(osc => {
+function OscillatorContainer({ loadedPatch }) {
+    const oscList = loadedPatch.current.oscillators.map(osc => {
         return <Oscillator
             key={osc.id}
             osc={osc}
             loadedPatch={loadedPatch}
-            setLoadedPatch={setLoadedPatch}
         />
     })
 
@@ -31,7 +30,7 @@ function OscillatorContainer({ loadedPatch, setLoadedPatch }) {
 
     return (
         <>
-            <h1>{loadedPatch.name}</h1>
+            <h1>{loadedPatch.current.name}</h1>
             <button onClick={savePatchSettings}>save changes</button>
             {oscList.sort((a, b) => {
                 return a.props.osc.number - b.props.osc.number
