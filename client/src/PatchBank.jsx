@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function PatchBank({patchList, setPatchList, setLoadedPatch}) {
+function PatchBank({patchList, setPatchList, setLoadedPatch, setNodes}) {
     const [showInput, setShowInput] = useState(false)
     const [inputValue, setInputValue] = useState("")
 
@@ -51,10 +51,15 @@ function PatchBank({patchList, setPatchList, setLoadedPatch}) {
         setPatchList([...patchList, newPatch])
     }
 
+    function handleClick(e, patch) {
+        setNodes([])
+        setLoadedPatch(patch)
+    }
+
   return (
     <div>
         {patchList.map(patch => {
-            return <div key={patch.id} onClick={() => setLoadedPatch(patch)}>{patch.name}</div>
+            return <div key={patch.id} onClick={e => handleClick(e, patch)}>{patch.name}</div>
         })}
         <button onClick={e => toggleInput(e)}>{showInput ? "cancel" : "+"}</button>
         {showInput ? 
@@ -66,7 +71,10 @@ function PatchBank({patchList, setPatchList, setLoadedPatch}) {
                     value={inputValue}
                     onChange={e => setInputValue(e.target.value)}
                 ></input>
-                <button type="submit">create new patch</button>
+                <button 
+                    type="submit">
+                    create new patch
+                </button>
             </form>
         : 
             <></>

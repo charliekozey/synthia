@@ -1,36 +1,32 @@
 // function todo() {
 // NOW DOING:
-// refactor to React bc state is getting complicated
-// add new patch
-// user login
+// save patch settings
 
 // TODO:
-// fix attack time behavior
+// add new patch
+// social patch info
+// GET user favorites
+// user login
+// remove unused gain node on note end
 // waveform manipulation (asdr) for individual oscillators
 // gain sliders not working right; i think there's an extra node hanging out somewhere
 // fix: behavior differs between click+slide vs. click on gain sliders
 // update gitignore
-// logarithmic release slider
-// clear unused nodes on note end
-// investigate beating
-// ~ o s c i l l o s c o p e ~
 // fix static on gain slider change
 // effects
 // lfo
 // EQ/filters
-// microtonality?
-// user login
 // beginner-friendly illustrations and self-guiding UI
 // sequencer
 // play more than 6 notes at a time?
-// stereo? spatial??
 // fix browser tab change bug (audio still plays)
-// arpeggiator
-// record output
-// note repeat
-// remove unused gain node on note end
+// localize key map
+// user profiles
+// filter global patches by user
+// filter patches by type (pad, bass, arp, etc)
+// patch descriptions?
+
 // REFACTOR: 
-// fix ungainly (pun very much intended) `node.gain_node.gain` situation
 // abstract out updateGain/updateRelease/updateAttack etc functions
 
 // IDEAS:
@@ -38,11 +34,20 @@
 // display held down keys in visual representation (qwerty? piano? both?)
 // calculate chord from held notes and display it
 // incorporate sequencer, etc
-// maybe similar target audience to hookpad
+// maybe similar target audience to hookpad?
 // trackpad as xy manipulator for pitch, other params
+// record output
+// investigate beating
+// ~ o s c i l l o s c o p e ~
+// microtonality?
+// stereo? spatial??
+// arpeggiator
+// import/export midi
+// external controller support
 // }
 
 import { useEffect, useState, useRef } from 'react'
+import Header from './Header'
 import PatchBank from './PatchBank'
 import OscillatorContainer from './OscillatorContainer'
 import './App.css'
@@ -50,8 +55,10 @@ import './App.css'
 function App() {
   const [oscillators, setOscillators] = useState([])
   const [nodes, setNodes] = useState([])
-  const [patchList, setPatchList] = useState([])
+  const [userPatchList, setUserPatchList] = useState([])
+  const [globalPatchList, setGlobalPatchList] = useState([])
   const [loadedPatch, setLoadedPatch] = useState()
+  const [user, setUser] = useState(null)
   const audioContext = new AudioContext()
   const keyboard = useRef({
     "a": { freq: 262, down: false },
@@ -76,82 +83,54 @@ function App() {
   const ref = useRef(null)
 
   useEffect(() => {
+    // On page load, focus div with keyup/keydown listeners attached
     ref.current.focus()
-  })
 
-  useEffect(() => {
     fetch("http://localhost:4000/patches")
       .then(res => res.json())
       .then(data => {
-        setPatchList(data)
+        setGlobalPatchList(data)
         setLoadedPatch(data[0])
+      })
+
+    fetch("http://localhost:4000/users")
+      .then(res => res.json())
+      .then(data => {
+        setUser(data[0])
       })
   }, [])
 
-  // useEffect(() => {
-  //   document.removeEventListener("keydown", e => {
-  //     if (Object.keys(keyboard.current).includes(e.key)) startSound(e)
-  //     if (e.key === "Escape") panic(e)
-  //     if (e.key === "x" || e.key === "z") changeOctave(e)
-  //   })
-  //   document.removeEventListener("keyup", e => stopSound(e))
+  useEffect(() => {
+    // Any time user changes, get user's patch list and set loaded patch to user's first patch.
+    // (If there is a user in state.)
+    if (user) {
+      setUserPatchList(user.patches)
+      setLoadedPatch(user.patches[0])
+    }
 
-  //   document.addEventListener("keydown", e => {
-  //     if (Object.keys(keyboard.current).includes(e.key)) startSound(e)
-  //     if (e.key === "Escape") panic(e)
-  //     if (e.key === "x" || e.key === "z") changeOctave(e)
-  //   })
-  //   document.addEventListener("keyup", e => stopSound(e))
-  //   console.log("keyup and keydown listener added")
-  // }, [loadedPatch])
+  }, [user])
 
   function handleKeyDown(e) {
     if (Object.keys(keyboard.current).includes(e.key)) startSound(e)
     if (e.key === "Escape") panic(e)
     if (e.key === "x" || e.key === "z") changeOctave(e)
   }
-  
-  function handleKeyUp(e){
+
+  function handleKeyUp(e) {
     if (Object.keys(keyboard.current).includes(e.key)) stopSound(e)
   }
-  // }, [loadedPatch]) (why did I have this here????)
-
-  // function loadPatch(patch) {
-  //   const patchTitle = document.getElementById("patch-title")
-  //   patchTitle.textContent = patch.name
-
-  //   oscillators.length = 0
-
-  //   patch.oscillators.forEach(osc => {
-  //       const typeSelect = document.getElementById(`type-select-${osc.number}`)
-  //       const gainSlider = document.getElementById(`gain-slider-${osc.number}`)
-  //       const attackSlider = document.getElementById(`attack-slider-${osc.number}`)
-  //       const releaseSlider = document.getElementById(`release-slider-${osc.number}`)
-  //       typeSelect.value = osc.osc_type
-  //       gainSlider.value = osc.gain
-  //       attackSlider.value = osc.attack
-  //       releaseSlider.value = osc.release
-
-  //       gainSlider.addEventListener("input", e => updateGain(e, osc.gain, osc.id))
-
-  //       oscillators.push(osc)
-
-  //       console.log(osc.release + "=>" + logifyValue(osc.release))
-  //   })
-
-  // }
 
   function startSound(e) {
     if (e.repeat) return
     const input = e.key
-    
+
     if (!!loadedPatch && !keyboard.current[input].down) {
       console.log("starting sound")
       loadedPatch.oscillators.forEach(osc => {
         const attackTime = logifyValue(osc.attack)
         console.log(osc.number + " activating")
-        const oscNode = new OscillatorNode(audioContext, {type: osc.osc_type, frequency: keyboard.current[input].freq})
-        const gainNode = new GainNode(audioContext, { gain: parseFloat(osc.gain)})
+        const oscNode = new OscillatorNode(audioContext, { type: osc.osc_type, frequency: keyboard.current[input].freq })
+        const gainNode = new GainNode(audioContext, { gain: parseFloat(osc.gain) })
         const typeSelect = document.getElementById(`type-select-${osc.number}`)
         const gainSlider = document.getElementById(`gain-slider-${osc.number}`)
         const releaseSlider = document.getElementById(`release-slider-${osc.number}`)
@@ -160,20 +139,13 @@ function App() {
           gain_node: gainNode,
           key_pressed: input,
           osc_data: osc
-      }
+        }
 
         oscNode.connect(gainNode)
-        // gainNode.gain.value = (parseFloat(osc.gain) * 0.01)
         gainNode.gain.setValueAtTime(0.0000000001, audioContext.currentTime)
-        // node.gain_node.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.05)
         gainNode.gain.linearRampToValueAtTime(parseFloat(osc.gain) * 0.1, audioContext.currentTime + parseFloat(attackTime) * 0.1)
         gainNode.connect(audioContext.destination)
         oscNode.start()
-
-        // gainSlider.addEventListener("input", e => updateGain(e, gainNode.gain.value, osc.id))
-        // releaseSlider.addEventListener("input", e => oscillators[0].gain = parseFloat(e.target.value))
-        // attackSlider.addEventListener("input", e => oscillators[0].gain = parseFloat(e.target.value))
-        // typeSelect.addEventListener("input", e => oscillators[0].osc_type = e.target.value)
 
         console.log("adding new node")
         console.log(nodes)
@@ -188,7 +160,7 @@ function App() {
 
     const input = e.key
     console.log("key down?", keyboard.current[input].down)
-    
+
     if (Object.keys(keyboard.current).includes(input)) {
       console.log("stopping sound")
 
@@ -201,15 +173,15 @@ function App() {
           node.gain_node.gain.exponentialRampToValueAtTime(0.0000000001, audioContext.currentTime + parseFloat(releaseTime))
 
           setTimeout(() => {
-              node.gain_node.disconnect()
-              node.osc_node.disconnect()
+            node.gain_node.disconnect()
+            node.osc_node.disconnect()
           }, 5000)
         }
       })
       keyboard.current[input].down = false
     }
     // setTimeout(() => {
-    //     nodes.length = 0
+    //     setNodes(state => [])
     // }, 1000)
 
   }
@@ -227,16 +199,16 @@ function App() {
   }
 
   function panic(e) {
-      nodes.forEach(node => {
-        console.log("stopping node")
-        node.gain_node.gain.setValueAtTime(node.gain_node.gain.value, audioContext.currentTime)
-        node.gain_node.gain.linearRampToValueAtTime(0.00001, audioContext.currentTime + 0.002)
+    nodes.forEach(node => {
+      console.log("stopping node")
+      node.gain_node.gain.setValueAtTime(node.gain_node.gain.value, audioContext.currentTime)
+      node.gain_node.gain.linearRampToValueAtTime(0.00001, audioContext.currentTime + 0.002)
 
-        setTimeout(() => {
-          node.gain_node.disconnect()
-          node.osc_node.disconnect()
-        }, 51)
-      })
+      setTimeout(() => {
+        node.gain_node.disconnect()
+        node.osc_node.disconnect()
+      }, 51)
+    })
   }
 
   function updateGain(e, gainToUpdate, oscId) {
@@ -286,17 +258,26 @@ function App() {
 
   return (
     <div id="main" ref={ref} tabIndex={0} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
-      <header>
-        <h1>welcome to ~ s y n t h i a ~</h1>
-      </header>
-      <h2>
-        use home row keys (the asdf row) to play
-      </h2>
-      <h2>
-        press escape to stop all sound
-      </h2>
-      <PatchBank patchList={patchList} setPatchList={setPatchList} setLoadedPatch={setLoadedPatch} />
-      {loadedPatch && <OscillatorContainer loadedPatch={loadedPatch} setLoadedPatch={setLoadedPatch} />}
+      <Header user={user} />
+      {loadedPatch &&
+        <OscillatorContainer
+          loadedPatch={loadedPatch}
+          setLoadedPatch={setLoadedPatch}
+        />}
+      <h2>User Patches</h2>
+      <PatchBank
+        patchList={userPatchList}
+        setPatchList={setUserPatchList}
+        setLoadedPatch={setLoadedPatch}
+        setNodes={setNodes}
+      />
+      <h2>Global Patches</h2>
+      <PatchBank
+        patchList={globalPatchList}
+        setPatchList={setGlobalPatchList}
+        setLoadedPatch={setLoadedPatch}
+        setNodes={setNodes}
+      />
     </div>
   )
 }
