@@ -6,3 +6,7 @@
   color: #333333;
   font-family: 'Andale Mono', monospace;
 }
+
+#main {
+  outline: none;
+}

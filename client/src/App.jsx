@@ -51,8 +51,8 @@ function App() {
   const [oscillators, setOscillators] = useState([])
   const [nodes, setNodes] = useState([])
   const [patchList, setPatchList] = useState([])
+  const [loadedPatch, setLoadedPatch] = useState()
   const audioContext = new AudioContext()
-  const loadedPatch = useRef({})
   const keyboard = useRef({
     "a": { freq: 262, down: false },
     "w": { freq: 277, down: false },
@@ -73,34 +73,47 @@ function App() {
     ";": { freq: 659, down: false },
     "'": { freq: 698, down: false },
   })
+  const ref = useRef(null)
 
-  console.log(keyboard.current)
+  useEffect(() => {
+    ref.current.focus()
+  })
 
   useEffect(() => {
     fetch("http://localhost:4000/patches")
       .then(res => res.json())
       .then(data => {
         setPatchList(data)
-        loadedPatch.current = data[0]
+        setLoadedPatch(data[0])
       })
   }, [])
 
-  useEffect(() => {
-    document.removeEventListener("keydown", e => {
-      if (Object.keys(keyboard.current).includes(e.key)) startSound(e)
-      if (e.key === "Escape") panic(e)
-      if (e.key === "x" || e.key === "z") changeOctave(e)
-    })
-    document.removeEventListener("keyup", e => stopSound(e))
+  // useEffect(() => {
+  //   document.removeEventListener("keydown", e => {
+  //     if (Object.keys(keyboard.current).includes(e.key)) startSound(e)
+  //     if (e.key === "Escape") panic(e)
+  //     if (e.key === "x" || e.key === "z") changeOctave(e)
+  //   })
+  //   document.removeEventListener("keyup", e => stopSound(e))
 
-    document.addEventListener("keydown", e => {
-      if (Object.keys(keyboard.current).includes(e.key)) startSound(e)
-      if (e.key === "Escape") panic(e)
-      if (e.key === "x" || e.key === "z") changeOctave(e)
-    })
-    document.addEventListener("keyup", e => stopSound(e))
-    console.log("keyup and keydown listener added")
-  }, [loadedPatch])
+  //   document.addEventListener("keydown", e => {
+  //     if (Object.keys(keyboard.current).includes(e.key)) startSound(e)
+  //     if (e.key === "Escape") panic(e)
+  //     if (e.key === "x" || e.key === "z") changeOctave(e)
+  //   })
+  //   document.addEventListener("keyup", e => stopSound(e))
+  //   console.log("keyup and keydown listener added")
+  // }, [loadedPatch])
+
+  function handleKeyDown(e) {
+    if (Object.keys(keyboard.current).includes(e.key)) startSound(e)
+    if (e.key === "Escape") panic(e)
+    if (e.key === "x" || e.key === "z") changeOctave(e)
+  }
+  
+  function handleKeyUp(e){
+    if (Object.keys(keyboard.current).includes(e.key)) stopSound(e)
+  }
   // }, [loadedPatch]) (why did I have this here????)
 
   // function loadPatch(patch) {
@@ -131,8 +144,9 @@ function App() {
   function startSound(e) {
     if (e.repeat) return
     const input = e.key
-
+    
     if (!!loadedPatch && !keyboard.current[input].down) {
+      console.log("starting sound")
       loadedPatch.oscillators.forEach(osc => {
         const attackTime = logifyValue(osc.attack)
         console.log(osc.number + " activating")
@@ -188,15 +202,15 @@ function App() {
 
           setTimeout(() => {
               node.gain_node.disconnect()
-              node. osc_node.disconnect()
-          }, 51)
+              node.osc_node.disconnect()
+          }, 5000)
         }
       })
       keyboard.current[input].down = false
     }
     // setTimeout(() => {
     //     nodes.length = 0
-    // }, 2000)
+    // }, 1000)
 
   }
 
@@ -251,7 +265,7 @@ function App() {
     const maxInput = 100
 
     const minValue = Math.log(1)
-    const maxValue = Math.log(10000000000000000000)
+    const maxValue = Math.log(100000000000000000000)
 
     const scale = (maxInput - minInput) / (maxValue - minValue)
 
@@ -271,7 +285,7 @@ function App() {
   // console.log("logifyValue(1.0) = ", logifyValue(1.0))
 
   return (
-    <div>
+    <div id="main" ref={ref} tabIndex={0} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
       <header>
         <h1>welcome to ~ s y n t h i a ~</h1>
       </header>
@@ -281,8 +295,8 @@ function App() {
       <h2>
         press escape to stop all sound
       </h2>
-      <PatchBank patchList={patchList} setPatchList={setPatchList} loadedPatch={loadedPatch} />
-      {loadedPatch && <OscillatorContainer loadedPatch={loadedPatch} />}
+      <PatchBank patchList={patchList} setPatchList={setPatchList} setLoadedPatch={setLoadedPatch} />
+      {loadedPatch && <OscillatorContainer loadedPatch={loadedPatch} setLoadedPatch={setLoadedPatch} />}
     </div>
   )
 }

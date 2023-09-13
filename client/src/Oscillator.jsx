@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function Oscillator({ osc, loadedPatch }) {
+function Oscillator({ osc, loadedPatch, setLoadedPatch }) {
     const [sliderValues, setSliderValues] = useState({
         gain: osc.gain,
         attack: osc.attack,
