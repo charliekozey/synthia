@@ -25,6 +25,7 @@
 // filter global patches by user
 // filter patches by type (pad, bass, arp, etc)
 // patch descriptions?
+// patch tags
 
 // REFACTOR: 
 // abstract out updateGain/updateRelease/updateAttack etc functions

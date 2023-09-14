@@ -1,15 +1,32 @@
 import { useState } from 'react'
 
-function Oscillator({ osc, loadedPatch, setLoadedPatch }) {
-    const [sliderValues, setSliderValues] = useState({
+function Oscillator({ osc, loadedPatch, setLoadedPatch, setIsModified }) {
+    const [oscValues, setOscValues] = useState({
+        osc_type: osc.osc_type,
         gain: osc.gain,
         attack: osc.attack,
-        release: osc.release
+        release: osc.release,
+        number: osc.number,
+        id: osc.id
     })
 
-    function updateSliderValue(e) {
+    function updateOscValue(e) {
+        const updatedOscArray = loadedPatch.oscillators.map(o => {
+            if (o.number === osc.number) {
+                o[e.target.name] = e.target.value
+                console.log("name", e.target.name)
+                console.log("value", e.target.value)
+            }
+            return o
+        })
+        console.log(updatedOscArray)
+        setLoadedPatch({
+            ...loadedPatch,
+            oscillators: updatedOscArray
+        })
         const { name, value } = e.target
-        setSliderValues({ ...sliderValues, [name]: value })
+        setOscValues({ ...oscValues, [name]: value })
+        setIsModified(true)
     }
 
     return (
@@ -18,8 +35,13 @@ function Oscillator({ osc, loadedPatch, setLoadedPatch }) {
                 <h3 id="osc-name">Osc {osc.number}</h3>
             </em>
 
-            <label htmlFor={`type-select-${osc.number}`}>wave:</label>
-            <select id={`type-select-${osc.number}`} name={`type-${osc.number}`}>
+            <label htmlFor={`osc_type`}>wave:</label>
+            <select 
+                id={`osc_type`} 
+                name={`osc_type`}
+                onChange={e => updateOscValue(e)}
+                value={oscValues.osc_type}
+            >
                 <option value="sine">sine</option>
                 <option value="triangle">triangle</option>
                 <option value="sawtooth">sawtooth</option>
@@ -33,8 +55,8 @@ function Oscillator({ osc, loadedPatch, setLoadedPatch }) {
                 min={0.001}
                 max={1}
                 step={0.01}
-                value={sliderValues.gain}
-                onChange={e => updateSliderValue(e)}
+                value={oscValues.gain}
+                onChange={e => updateOscValue(e)}
             ></input>
 
             <label htmlFor="attack">attack:</label>
@@ -44,8 +66,8 @@ function Oscillator({ osc, loadedPatch, setLoadedPatch }) {
                 min={0.001}
                 max={1}
                 step={0.01}
-                value={sliderValues.attack}
-                onChange={e => updateSliderValue(e)}
+                value={oscValues.attack}
+                onChange={e => updateOscValue(e)}
             ></input>
 
             <label htmlFor="release">release:</label>
@@ -55,8 +77,8 @@ function Oscillator({ osc, loadedPatch, setLoadedPatch }) {
                 min={0.001}
                 max={1}
                 step={0.01}
-                value={sliderValues.release}
-                onChange={e => updateSliderValue(e)}
+                value={oscValues.release}
+                onChange={e => updateOscValue(e)}
             ></input>
 
         </>

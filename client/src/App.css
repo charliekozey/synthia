@@ -2,11 +2,19 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 1rem;
-  text-shadow: 1px 1px magenta;
+  text-shadow: 1px 1px lime;
   color: #333333;
   font-family: 'Andale Mono', monospace;
 }
 
 #main {
   outline: none;
+}
+
+.patch-card {
+  cursor: pointer;
+}
+
+button {
+  cursor: pointer;
 }
