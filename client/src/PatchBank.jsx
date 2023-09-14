@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import Patch from './Patch'
 
-function PatchBank({patchList, setPatchList, setLoadedPatch, setNodes}) {
-    const [showInput, setShowInput] = useState(false)
-    const [inputValue, setInputValue] = useState("")
+function PatchBank({ patchList, setPatchList, setLoadedPatch, setNodes, user, bankType }) {
+
+    console.log(bankType)
 
     function toggleInput(e) {
         setShowInput(show => !show)
@@ -13,75 +13,70 @@ function PatchBank({patchList, setPatchList, setLoadedPatch, setNodes}) {
         e.preventDefault()
 
         const newPatch = {
-                            "name": inputValue,
-                            "oscillators": [
-                                {
-                                    "attack": 0.2,
-                                    "decay": 0.2,
-                                    "gain": 0.2,
-                                    "number": 1,
-                                    "osc_type": "sine",
-                                    "release": 0.2,
-                                    "sustain": 0.2
-                                },
-                                {
-                                    "attack": 0.2,
-                                    "decay": 0.2,
-                                    "gain": 0.2,
-                                    "number": 2,
-                                    "osc_type": "sine",
-                                    "release": 0.2,
-                                    "sustain": 0.2
-                                },
-                                {
-                                    "attack": 0.2,
-                                    "decay": 0.2,
-                                    "gain": 0.2,
-                                    "number": 3,
-                                    "osc_type": "sine",
-                                    "release": 0.2,
-                                    "sustain": 0.2
-                                }
-                            ]
-                        }
-                        
-        setInputValue("")
+            "name": "new patch",
+            "creator": user,
+            "oscillators": [
+                {
+                    "attack": 0.2,
+                    "decay": 0.2,
+                    "gain": 0.2,
+                    "number": 1,
+                    "osc_type": "sine",
+                    "release": 0.2,
+                    "sustain": 0.2
+                },
+                {
+                    "attack": 0.2,
+                    "decay": 0.2,
+                    "gain": 0.2,
+                    "number": 2,
+                    "osc_type": "sine",
+                    "release": 0.2,
+                    "sustain": 0.2
+                },
+                {
+                    "attack": 0.2,
+                    "decay": 0.2,
+                    "gain": 0.2,
+                    "number": 3,
+                    "osc_type": "sine",
+                    "release": 0.2,
+                    "sustain": 0.2
+                }
+            ]
+        }
+
+        fetch("http://localhost:4000/patches", {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify(newPatch)
+        })
+
         setLoadedPatch(newPatch)
 
         console.log(patchList)
         setPatchList([...patchList, newPatch])
     }
 
-  return (
-    <div>
-        {patchList.map(patch => {
-            return <Patch 
-                key={patch.id} 
-                patch={patch}
-                setNodes={setNodes}
-                setLoadedPatch={setLoadedPatch}
-            />
-        })}
-        <button onClick={e => toggleInput(e)}>{showInput ? "cancel" : "+"}</button>
-        {showInput ? 
-            <form onSubmit={e => addNewPatch(e)}>
-                <input 
-                    type="text"
-                    name="new-patch-name"
-                    placeholder="name your new patch"
-                    value={inputValue}
-                    onChange={e => setInputValue(e.target.value)}
-                ></input>
-                <button 
-                    type="submit">
-                    create new patch
-                </button>
-            </form>
-        : 
-            <></>
-        }
-    </div>
-  )
+    return (
+        <div>
+            {patchList.map(patch => {
+                return <Patch
+                    key={patch.id}
+                    patch={patch}
+                    setNodes={setNodes}
+                    setLoadedPatch={setLoadedPatch}
+                />
+            })}
+            {
+                bankType === "user" &&
+                <button onClick={addNewPatch}>+</button>
+            }
+        </div>
+    )
 }
 
 export default PatchBank

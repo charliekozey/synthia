@@ -21,7 +21,7 @@ def hello():
 
 @app.get('/users')
 def index_users():
-    users = User.query.all()
+    users = User.query.order_by(User.id).all()
     user_dicts = [user.to_dict() for user in users]
     
     # for user in user_dicts:
@@ -34,7 +34,7 @@ def index_users():
 
 @app.get('/oscillators')
 def index_oscillators():
-    oscillators = Oscillator.query.all()
+    oscillators = Oscillator.query.order_by(Oscillator.id).all()
     osc_dicts = [osc.to_dict() for osc in oscillators]
     
     # for user in user_dicts:
@@ -48,10 +48,39 @@ def index_oscillators():
 
 @app.get('/patches')
 def index_patches():
-    patches = Patch.query.all()
+    patches = Patch.query.order_by(Patch.id).all()
     patch_dicts = [patch.to_dict() for patch in patches]
 
     return make_response(jsonify(patch_dicts), 200)
+
+@app.post('/patches')
+def add_patch():
+    data = request.get_json()
+
+    patch = Patch()
+    patch_oscillators = []
+
+    for osc in data['oscillators']:
+        new_osc = Oscillator(
+            osc_type = osc['osc_type'],
+            gain = osc['gain'],
+            attack = osc['attack'],
+            decay = osc['decay'],
+            sustain = osc['sustain'],
+            release = osc['release']
+        )
+        print(osc)
+        patch_oscillators.append(new_osc)
+
+    patch.name = data['name']
+    patch.oscillators = patch_oscillators
+
+    print(patch_oscillators)
+
+    # db.session.add(patch)
+    # db.session.commit()
+
+    return make_response(jsonify({"message": "new patch created"}), 200)
 
 @app.patch('/patches/<int:id>')
 def update_patch(id):
@@ -61,30 +90,6 @@ def update_patch(id):
         return jsonify({"message": "Patch not found"}), 404
 
     data = request.get_json()
-
-    ####### OLD VERSION ################################
-    # def update_oscillator(osc):
-    #     try:
-    #         oscillator = Oscillator.query.get(osc['id'])
-    #         if oscillator:
-    #             oscillator.type = osc['osc_type']
-    #             oscillator.gain = osc['gain']
-    #             oscillator.attack = osc['attack']
-    #             oscillator.decay = osc['decay']
-    #             oscillator.sustain = osc['sustain']
-    #             oscillator.release = osc['release']
-    #             db.session.add(oscillator)
-    
-    #             print(osc['osc_type'])
-    #             print(osc['gain'])
-    #             print(osc['attack'])
-    #             print(osc['decay'])
-    #             print(osc['sustain'])
-    #             print(osc['release'])
-    #         else:
-    #             print(f"Oscillator with ID {osc['id']} not found.")
-    #     except Exception as e:
-    #         print(f"Error updating oscillator: {str(e)}")
 
     if 'name' in data:
         patch.name = data['name']

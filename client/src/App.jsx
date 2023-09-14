@@ -1,6 +1,5 @@
 // function todo() {
 // NOW DOING:
-// save patch settings
 
 // TODO:
 // add new patch
@@ -271,6 +270,8 @@ function App() {
         setPatchList={setUserPatchList}
         setLoadedPatch={setLoadedPatch}
         setNodes={setNodes}
+        user={user}
+        bankType="user"
       />
       <h2>Global Patches</h2>
       <PatchBank
@@ -278,6 +279,7 @@ function App() {
         setPatchList={setGlobalPatchList}
         setLoadedPatch={setLoadedPatch}
         setNodes={setNodes}
+        bankType="global"
       />
     </div>
   )
