@@ -1,10 +1,11 @@
 // function todo() {
 // NOW DOING:
+// GET user favorites
+
 
 // TODO:
 // add new patch
 // social patch info
-// GET user favorites
 // user login
 // remove unused gain node on note end
 // waveform manipulation (asdr) for individual oscillators

@@ -9,14 +9,17 @@ if __name__ == '__main__':
     with app.app_context():
         print("🗑 Clearing db... ")
         Oscillator.query.delete()
+        Favorite.query.delete()
         Patch.query.delete()
         User.query.delete()
-        # Favorite.query.delete()
 
         fake = Faker()
 
         print("🌱 Seeding Users...")
-        users = [User(name = "Naomi"), User(name="Jojo"), User(name="Katie")]
+        users = []
+        for i in range(10):
+            user = User(name=fake.user_name())
+            users.append(user)
         db.session.add_all(users)
         db.session.commit()
 
@@ -25,7 +28,7 @@ if __name__ == '__main__':
         osc_types = ["sine", "triangle", "square", "sawtooth"]
         for i in range(20):
             user = choice(users)
-            patch = Patch(name=fake.color_name(), user_id=user.id, oscillators=[])
+            patch = Patch(name=fake.color_name(), creator_id=user.id, oscillators=[])
             oscillator1 = Oscillator(
                     number=1, 
                     osc_type=choice(osc_types), 
@@ -63,7 +66,13 @@ if __name__ == '__main__':
         db.session.add_all(patches)
         db.session.commit()
         
-        # print("🌱 Seeding Favorites...")
+        print("🌱 Seeding Favorites...")
+        for i in range(50):
+            favs = []
+            fav = Favorite(patch_id=choice(patches).id, user_id=choice(users).id) 
+            favs.append(fav)
+            db.session.add_all(favs)
+            db.session.commit()
 
         # print("🌱 Seeding Oscillators...")
 

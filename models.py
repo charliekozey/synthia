@@ -3,25 +3,18 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy_serializer import SerializerMixin
 from database import db
 
-# favorite_patch_association = db.Table(
-#     'favorite_patch_association',
-#     db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
-#     db.Column('patch_id', db.Integer, db.ForeignKey('patches.id'), primary_key=True)
-# )
-
 class User(db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     patches = db.relationship('Patch', back_populates='creator', lazy=True)
-    # favorite_patches = db.relationship('Patch', secondary="favorites", back_populates='favorited_by', lazy=True)
+    favorites = db.relationship('Favorite', back_populates='user', cascade='all, delete-orphan')
 
     def to_dict(self, include_patches=True):
         user_dict = {
             "id": self.id,
             "name": self.name,
-            # "favorite_patches": [patch.to_dict() for patch in self.favorite_patches]
         }
 
         if include_patches:
@@ -37,7 +30,7 @@ class Patch(db.Model):
     creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     creator = db.relationship('User', back_populates='patches')
     oscillators = db.relationship('Oscillator', back_populates='patch', lazy=True)
-    # favorited_by = db.relationship('User', secondary="favorites", back_populates='favorite_patches', lazy=True)
+    favorites = db.relationship('Favorite', back_populates='patch', cascade='all, delete-orphan')
 
     def to_dict(self, include_creator=True, include_fav=True):
 
@@ -50,8 +43,8 @@ class Patch(db.Model):
         if include_creator:
             patch_dict["creator"] = self.creator.to_dict(include_patches=False)
 
-        # if include_fav:
-        #     patch_dict["favorited_by"] = [user.to_dict(include_fav=False) for user in self.favorited_by]
+        if include_fav:
+            patch_dict["favorited_by"] = [user.to_dict(include_fav=False) for user in self.favorites]
 
         return patch_dict
 
@@ -79,6 +72,21 @@ class Oscillator(db.Model):
             "decay": self.decay,
             "sustain": self.sustain,
             "release": self.release,
+        }
+
+class Favorite(db.Model):
+    __tablename__ = "favorites"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    patch_id = db.Column(db.Integer, db.ForeignKey('patches.id'), nullable=False)
+    user = db.relationship('User', back_populates='favorites')
+    patch = db.relationship('Patch', back_populates='favorites')    
+
+    def to_dict(self, include_fav=True):
+        return {
+            "user": self.user.to_dict(self, include_patches=False),
+            "patch": self.patch.to_dict(self, include_creator=False, include_fav=False),
         }
 
 if __name__ == '__main__':
