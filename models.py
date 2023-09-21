@@ -11,7 +11,7 @@ class User(db.Model):
     patches = db.relationship('Patch', back_populates='creator', lazy=True)
     favorites = db.relationship('Favorite', back_populates='user', cascade='all, delete-orphan')
 
-    def to_dict(self, include_patches=True):
+    def to_dict(self, include_patches=True, include_fav=True):
         user_dict = {
             "id": self.id,
             "name": self.name,
@@ -19,6 +19,9 @@ class User(db.Model):
 
         if include_patches:
             user_dict["patches"] = [patch.to_dict() for patch in self.patches]
+
+        if include_fav:
+            user_dict["favorite_patches"] = [patch.to_dict() for patch in self.favorites]
 
         return user_dict
 
@@ -85,8 +88,11 @@ class Favorite(db.Model):
 
     def to_dict(self, include_fav=True):
         return {
-            "user": self.user.to_dict(self, include_patches=False),
-            "patch": self.patch.to_dict(self, include_creator=False, include_fav=False),
+            "user_name": self.user.name,
+            "id": self.user.id,
+            "patch_name": self.patch.name,
+            "patch_id": self.patch.id,
+            "user_id": self.user.id
         }
 
 if __name__ == '__main__':

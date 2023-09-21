@@ -24,25 +24,21 @@ def index_users():
     users = User.query.order_by(User.id).all()
     user_dicts = [user.to_dict() for user in users]
     
-    # for user in user_dicts:
-    #     for patch in user['patches']:
-    #         print(patch)
-            # user['patches'] = [patch.to_dict() for patch in user['patches']]
-
-    # return ""
     return make_response(jsonify(user_dicts), 200)
+
+
+@app.get('/users/<int:id>')
+def show_user(id):
+    user = User.query.get(id)
+
+    return make_response(jsonify(user.to_dict()), 200)
+
 
 @app.get('/oscillators')
 def index_oscillators():
     oscillators = Oscillator.query.order_by(Oscillator.id).all()
     osc_dicts = [osc.to_dict() for osc in oscillators]
-    
-    # for user in user_dicts:
-    #     for patch in user['patches']:
-    #         print(patch)
-            # user['patches'] = [patch.to_dict() for patch in user['patches']]
 
-    # return ""
     return make_response(jsonify(osc_dicts), 200)
 
 
@@ -52,6 +48,7 @@ def index_patches():
     patch_dicts = [patch.to_dict() for patch in patches]
 
     return make_response(jsonify(patch_dicts), 200)
+
 
 @app.post('/patches')
 def add_patch():
@@ -81,6 +78,7 @@ def add_patch():
     # db.session.commit()
 
     return make_response(jsonify({"message": "new patch created"}), 200)
+
 
 @app.patch('/patches/<int:id>')
 def update_patch(id):

@@ -1,51 +1,53 @@
-// function todo() {
-// NOW DOING:
-// GET user favorites
+function todo() {
+  // NOW DOING:
+  // GET user favorites
 
 
-// TODO:
-// add new patch
-// social patch info
-// user login
-// remove unused gain node on note end
-// waveform manipulation (asdr) for individual oscillators
-// gain sliders not working right; i think there's an extra node hanging out somewhere
-// fix: behavior differs between click+slide vs. click on gain sliders
-// update gitignore
-// fix static on gain slider change
-// effects
-// lfo
-// EQ/filters
-// beginner-friendly illustrations and self-guiding UI
-// sequencer
-// play more than 6 notes at a time?
-// fix browser tab change bug (audio still plays)
-// localize key map
-// user profiles
-// filter global patches by user
-// filter patches by type (pad, bass, arp, etc)
-// patch descriptions?
-// patch tags
+  // TODO:
+  // add new patch
+  // social patch info
+  // user login
+  // remove unused gain node on note end
+  // waveform manipulation (asdr) for individual oscillators
+  // gain sliders not working right; i think there's an extra node hanging out somewhere
+  // fix: behavior differs between click+slide vs. click on gain sliders
+  // update gitignore
+  // fix static on gain slider change
+  // effects
+  // lfo
+  // EQ/filters
+  // beginner-friendly illustrations and self-guiding UI
+  // sequencer
+  // play more than 6 notes at a time?
+  // fix browser tab change bug (audio still plays)
+  // localize key map
+  // user profiles
+  // filter global patches by user
+  // filter patches by type (pad, bass, arp, etc)
+  // patch descriptions?
+  // patch tags
 
-// REFACTOR: 
-// abstract out updateGain/updateRelease/updateAttack etc functions
+  // REFACTOR: 
+  // abstract out updateGain/updateRelease/updateAttack etc functions
 
-// IDEAS:
-// target ed space? younger audience?
-// display held down keys in visual representation (qwerty? piano? both?)
-// calculate chord from held notes and display it
-// incorporate sequencer, etc
-// maybe similar target audience to hookpad?
-// trackpad as xy manipulator for pitch, other params
-// record output
-// investigate beating
-// ~ o s c i l l o s c o p e ~
-// microtonality?
-// stereo? spatial??
-// arpeggiator
-// import/export midi
-// external controller support
-// }
+  // IDEAS:
+  // target ed space? younger audience?
+  // display held down keys in visual representation (qwerty? piano? both?)
+  // calculate chord from held notes and display it
+  // incorporate sequencer, etc
+  // maybe similar target audience to hookpad?
+  // trackpad as xy manipulator for pitch, other params
+  // record output
+  // investigate beating
+  // ~ o s c i l l o s c o p e ~
+  // microtonality?
+  // stereo? spatial??
+  // arpeggiator
+  // import/export midi
+  // external controller support
+  // visual representation of each patch? 
+  // // diff sound parameters correspond to diff visuals
+}
 
 import { useEffect, useState, useRef } from 'react'
 import Header from './Header'
@@ -87,6 +89,12 @@ function App() {
     // On page load, focus div with keyup/keydown listeners attached
     ref.current.focus()
 
+    fetch("http://localhost:4000/users")
+      .then(res => res.json())
+      .then(data => {
+        setUser(data[0])
+      })
+      
     fetch("http://localhost:4000/patches")
       .then(res => res.json())
       .then(data => {
@@ -94,11 +102,6 @@ function App() {
         setLoadedPatch(data[0])
       })
 
-    fetch("http://localhost:4000/users")
-      .then(res => res.json())
-      .then(data => {
-        setUser(data[0])
-      })
   }, [])
 
   useEffect(() => {
