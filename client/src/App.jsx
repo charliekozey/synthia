@@ -56,7 +56,7 @@ import './App.css'
 
 function App() {
   const [oscillators, setOscillators] = useState([])
-  const [nodes, setNodes] = useState([])
+  const nodesRef = useRef([])
   const [userPatchList, setUserPatchList] = useState([])
   const [globalPatchList, setGlobalPatchList] = useState([])
   const [loadedPatch, setLoadedPatch] = useState()
@@ -110,6 +110,7 @@ function App() {
       setUserPatchList(user.patches)
       setLoadedPatch(user.patches[0])
     }
+    console.log("user changed")
 
   }, [user])
 
@@ -151,8 +152,8 @@ function App() {
         oscNode.start()
 
         console.log("adding new node")
-        console.log(nodes)
-        setNodes(nodes => [...nodes, newNode])
+        console.log(nodesRef.current)
+        nodesRef.current = [...nodesRef.current, newNode]
       })
 
       keyboard.current[input].down = true
@@ -167,7 +168,7 @@ function App() {
     if (Object.keys(keyboard.current).includes(input)) {
       console.log("stopping sound")
 
-      nodes.forEach(node => {
+      nodesRef.current.forEach(node => {
         const releaseTime = logifyValue(node.osc_data.release)
 
         if (node.key_pressed == input) {
@@ -184,7 +185,7 @@ function App() {
       keyboard.current[input].down = false
     }
     // setTimeout(() => {
-    //     setNodes(state => [])
+    //     nodesRef.current = []
     // }, 1000)
 
   }
@@ -198,11 +199,10 @@ function App() {
         keyboard.current[note].freq = keyboard.current[note].freq * 2
       }
     }
-
   }
 
   function panic(e) {
-    nodes.forEach(node => {
+    nodesRef.current.forEach(node => {
       console.log("stopping node")
       node.gain_node.gain.setValueAtTime(node.gain_node.gain.value, audioContext.currentTime)
       node.gain_node.gain.linearRampToValueAtTime(0.00001, audioContext.currentTime + 0.002)
@@ -272,7 +272,7 @@ function App() {
         patchList={userPatchList}
         setPatchList={setUserPatchList}
         setLoadedPatch={setLoadedPatch}
-        setNodes={setNodes}
+        // setNodes={setNodes}
         user={user}
         bankType="user"
       />
@@ -281,7 +281,7 @@ function App() {
         patchList={globalPatchList}
         setPatchList={setGlobalPatchList}
         setLoadedPatch={setLoadedPatch}
-        setNodes={setNodes}
+        // setNodes={setNodes}
         bankType="global"
       />
     </div>
