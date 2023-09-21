@@ -1,7 +1,6 @@
 function todo() {
   // NOW DOING:
-  // GET user favorites
-
+  // fix audio issues
 
   // TODO:
   // add new patch
