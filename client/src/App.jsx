@@ -39,6 +39,7 @@ function todo() {
   // record output
   // investigate beating
   // ~ o s c i l l o s c o p e ~
+  // // https://www.twilio.com/blog/audio-visualisation-web-audio-api--react
   // microtonality?
   // stereo? spatial??
   // arpeggiator
@@ -84,6 +85,8 @@ function App() {
   })
   const ref = useRef(null)
 
+  console.log(audioContext.baseLatency)
+
   useEffect(() => {
     // On page load, focus div with keyup/keydown listeners attached
     ref.current.focus()
@@ -110,7 +113,7 @@ function App() {
       setUserPatchList(user.patches)
       setLoadedPatch(user.patches[0])
     }
-    console.log("user changed")
+    // console.log("user changed")
 
   }, [user])
 
@@ -124,15 +127,23 @@ function App() {
     if (Object.keys(keyboard.current).includes(e.key)) stopSound(e)
   }
 
+  function updateNodesRef(updatedNodes) {
+    nodesRef.current = updatedNodes
+  }
+
   function startSound(e) {
     if (e.repeat) return
     const input = e.key
 
     if (!!loadedPatch && !keyboard.current[input].down) {
-      console.log("starting sound")
+      // console.log("starting sound")
       loadedPatch.oscillators.forEach(osc => {
-        const attackTime = logifyValue(osc.attack)
-        console.log(osc.number + " activating")
+        const sampleRate = audioContext.sampleRate
+        const duration = 1.0
+        const buffer = audioContext.createBuffer(1, sampleRate * duration, sampleRate)
+        const channelData = buffer.getChannelData(0)
+        const attackTime = parseFloat(logifyValue(osc.attack)) * 0.1
+        // console.log(osc.number + " activating")
         const oscNode = new OscillatorNode(audioContext, { type: osc.osc_type, frequency: keyboard.current[input].freq })
         const gainNode = new GainNode(audioContext, { gain: parseFloat(osc.gain) })
         const typeSelect = document.getElementById(`type-select-${osc.number}`)
@@ -145,14 +156,19 @@ function App() {
           osc_data: osc
         }
 
+        for (let i = 0; i < buffer.length; i++) {
+          channelData[i] = Math.sin((i / sampleRate) * 2 * Math.PI * 440); // Generate a 440Hz sine wave
+        }
+
+        oscNode.buffer = buffer
         oscNode.connect(gainNode)
         gainNode.gain.setValueAtTime(0.0000000001, audioContext.currentTime)
-        gainNode.gain.linearRampToValueAtTime(parseFloat(osc.gain) * 0.1, audioContext.currentTime + parseFloat(attackTime) * 0.1)
+        gainNode.gain.linearRampToValueAtTime(parseFloat(osc.gain) * 0.1, audioContext.currentTime + attackTime)
         gainNode.connect(audioContext.destination)
         oscNode.start()
 
-        console.log("adding new node")
-        console.log(nodesRef.current)
+        // console.log("adding new node")
+        // console.log(nodesRef.current)
         nodesRef.current = [...nodesRef.current, newNode]
       })
 
@@ -163,10 +179,10 @@ function App() {
   function stopSound(e) {
 
     const input = e.key
-    console.log("key down?", keyboard.current[input].down)
+    // console.log("key down?", keyboard.current[input].down)
 
     if (Object.keys(keyboard.current).includes(input)) {
-      console.log("stopping sound")
+      // console.log("stopping sound")
 
       nodesRef.current.forEach(node => {
         const releaseTime = logifyValue(node.osc_data.release)
@@ -203,7 +219,7 @@ function App() {
 
   function panic(e) {
     nodesRef.current.forEach(node => {
-      console.log("stopping node")
+      // console.log("stopping node")
       node.gain_node.gain.setValueAtTime(node.gain_node.gain.value, audioContext.currentTime)
       node.gain_node.gain.linearRampToValueAtTime(0.00001, audioContext.currentTime + 0.002)
 
@@ -217,11 +233,11 @@ function App() {
   function updateGain(e, gainToUpdate, oscId) {
     // const saveStatus = document.getElementById("save-status")
     // saveStatus.style.display = "block"
-    console.log(oscId)
-    console.log("updating gain")
-    console.log(e)
+    // console.log(oscId)
+    // console.log("updating gain")
+    // console.log(e)
     gainToUpdate = parseFloat(e.target.value)
-    console.log(gainToUpdate)
+    // console.log(gainToUpdate)
 
     fetch(`http://localhost:4000/oscillators/${oscId}`, {
       method: "PATCH",
@@ -231,8 +247,8 @@ function App() {
       },
       body: JSON.stringify({ gain: gainToUpdate })
     })
-      .then(res => res.json())
-      .then(data => console.log(data.message))
+      // .then(res => res.json())
+      // .then(data => console.log(data.message))
   }
 
   function logifyValue(position) {
@@ -272,6 +288,8 @@ function App() {
         patchList={userPatchList}
         setPatchList={setUserPatchList}
         setLoadedPatch={setLoadedPatch}
+        updateNodesRef={updateNodesRef}
+        nodesRef={nodesRef}
         // setNodes={setNodes}
         user={user}
         bankType="user"
@@ -281,6 +299,7 @@ function App() {
         patchList={globalPatchList}
         setPatchList={setGlobalPatchList}
         setLoadedPatch={setLoadedPatch}
+        updateNodesRef={updateNodesRef}
         // setNodes={setNodes}
         bankType="global"
       />

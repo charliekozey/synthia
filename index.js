@@ -89,8 +89,6 @@ function loadPatch(patch) {
     const patchTitle = document.getElementById("patch-title")
     patchTitle.textContent = patch.name
 
-    
-    
     oscillators.length = 0
     
     patch.oscillators.forEach(osc => {
@@ -107,7 +105,7 @@ function loadPatch(patch) {
         
         oscillators.push(osc)
 
-        console.log(osc.release + "=>" + logValue(osc.release))
+        // console.log(osc.release + "=>" + logValue(osc.release))
     })
 
 }
@@ -120,12 +118,14 @@ function startSound(e) {
     if(Object.keys(keyboard).includes(input) && !keyboard[input].down) {
         oscillators.forEach(osc => {
             const attackTime = logValue(osc.attack)
-            console.log(osc.number + " activating")
+            // console.log(osc.number + " activating")
             const oscNode = new OscillatorNode(audioContext, {type: osc.osc_type, frequency: keyboard[input].freq})
             const gainNode = new GainNode(audioContext, { gain: parseFloat(osc.gain)})
             const typeSelect = document.getElementById(`type-select-${osc.number}`)
             const gainSlider = document.getElementById(`gain-slider-${osc.number}`)
             const releaseSlider = document.getElementById(`release-slider-${osc.number}`)
+            const attackSlider = document.getElementById(`attack-slider-${osc.number}`)
+
 
             oscNode.connect(gainNode)
             // gainNode.gain.value = (parseFloat(osc.gain) * 0.01)
@@ -193,7 +193,7 @@ function changeOctave(e) {
 function panic(e) {
     if (e.key == "Escape"){
         nodes.forEach(node => {
-            console.log("stopping node")
+            // console.log("stopping node")
             node.gain_node.gain.setValueAtTime(node.gain_node.gain.value, audioContext.currentTime)
             node.gain_node.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.002)
 
@@ -208,11 +208,11 @@ function panic(e) {
 function updateGain(e, gainToUpdate, oscId) {
     // const saveStatus = document.getElementById("save-status")
     // saveStatus.style.display = "block"
-    console.log(oscId)
-    console.log("updating gain")
-    console.log(e)
+    // console.log(oscId)
+    // console.log("updating gain")
+    // console.log(e)
     gainToUpdate = parseFloat(e.target.value)
-    console.log(gainToUpdate)
+    // console.log(gainToUpdate)
 
     fetch(`http://localhost:4000/oscillators/${oscId}`, {
         method: "PATCH",
@@ -223,7 +223,7 @@ function updateGain(e, gainToUpdate, oscId) {
         body: JSON.stringify({gain: gainToUpdate})
     })
         .then(res => res.json())
-        .then(data => console.log(data.message))
+        // .then(data => console.log(data.message))
 }
 
 document.addEventListener("keydown", e => startSound(e))
@@ -244,14 +244,14 @@ function logValue(position) {
     return Math.exp(minValue + scale*(position-minInput))
 }
 
-console.log("logValue(0.0) = ", logValue(0.0))
-console.log("logValue(0.1) = ", logValue(0.1))
-console.log("logValue(0.2) = ", logValue(0.2))
-console.log("logValue(0.3) = ", logValue(0.3))
-console.log("logValue(0.4) = ", logValue(0.4))
-console.log("logValue(0.5) = ", logValue(0.5))
-console.log("logValue(0.6) = ", logValue(0.6))
-console.log("logValue(0.7) = ", logValue(0.7))
-console.log("logValue(0.8) = ", logValue(0.8))
-console.log("logValue(0.9) = ", logValue(0.9))
-console.log("logValue(1.0) = ", logValue(1.0))
+// console.log("logValue(0.0) = ", logValue(0.0))
+// console.log("logValue(0.1) = ", logValue(0.1))
+// console.log("logValue(0.2) = ", logValue(0.2))
+// console.log("logValue(0.3) = ", logValue(0.3))
+// console.log("logValue(0.4) = ", logValue(0.4))
+// console.log("logValue(0.5) = ", logValue(0.5))
+// console.log("logValue(0.6) = ", logValue(0.6))
+// console.log("logValue(0.7) = ", logValue(0.7))
+// console.log("logValue(0.8) = ", logValue(0.8))
+// console.log("logValue(0.9) = ", logValue(0.9))
+// console.log("logValue(1.0) = ", logValue(1.0))

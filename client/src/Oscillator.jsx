@@ -14,12 +14,12 @@ function Oscillator({ osc, loadedPatch, setLoadedPatch, setIsModified }) {
         const updatedOscArray = loadedPatch.oscillators.map(o => {
             if (o.number === osc.number) {
                 o[e.target.name] = e.target.value
-                console.log("name", e.target.name)
-                console.log("value", e.target.value)
+                // console.log("name", e.target.name)
+                // console.log("value", e.target.value)
             }
             return o
         })
-        console.log(updatedOscArray)
+        // console.log(updatedOscArray)
         setLoadedPatch({
             ...loadedPatch,
             oscillators: updatedOscArray

@@ -30,8 +30,8 @@ function OscillatorContainer({ loadedPatch, setLoadedPatch }) {
             },
             body: JSON.stringify(loadedPatch)
         })
-            .then(res => res.json())
-            .then(data => console.log(data.message))
+            // .then(res => res.json())
+            // .then(data => console.log(data.message))
         }
         
     function savePatchName() {
@@ -45,8 +45,8 @@ function OscillatorContainer({ loadedPatch, setLoadedPatch }) {
             },
             body: JSON.stringify({...loadedPatch, name: newName})
         })
-            .then(res => res.json())
-            .then(data => console.log(data.message))
+            // .then(res => res.json())
+            // .then(data => console.log(data.message))
 
         setLoadedPatch({...loadedPatch, name: newName})
         setNewName("")

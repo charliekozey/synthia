@@ -1,13 +1,13 @@
 import React from 'react'
 
-function Patch({ patch, setNodes, setLoadedPatch }) {
+function Patch({ patch, setLoadedPatch, updateNodesRef }) {
     
     function handleClick() {
-        setNodes([])
+        updateNodesRef([])
         setLoadedPatch(patch)
     }
 
-    console.log(patch)
+    // console.log(patch)
     
     return (
         <div className="patch-card" onClick={handleClick}>

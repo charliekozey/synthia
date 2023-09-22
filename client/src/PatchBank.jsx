@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import Patch from './Patch'
 
-function PatchBank({ patchList, setPatchList, setLoadedPatch, setNodes, user, bankType }) {
+function PatchBank({ patchList, setPatchList, setLoadedPatch, setNodes, user, bankType, updateNodesRef }) {
 
-    console.log(bankType)
+    // console.log(bankType)
 
     function toggleInput(e) {
         setShowInput(show => !show)
@@ -57,7 +57,7 @@ function PatchBank({ patchList, setPatchList, setLoadedPatch, setNodes, user, ba
 
         setLoadedPatch(newPatch)
 
-        console.log(patchList)
+        // console.log(patchList)
         setPatchList([...patchList, newPatch])
     }
 
@@ -69,6 +69,7 @@ function PatchBank({ patchList, setPatchList, setLoadedPatch, setNodes, user, ba
                     patch={patch}
                     setNodes={setNodes}
                     setLoadedPatch={setLoadedPatch}
+                    updateNodesRef={updateNodesRef}
                 />
             })}
             {
