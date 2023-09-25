@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Oscillator from './Oscillator'
 
-function OscillatorContainer({ loadedPatch, setLoadedPatch }) {
+function OscillatorContainer({ loadedPatch, setLoadedPatch,  userPatchList, setUserPatchList }) {
     const [isModified, setIsModified] = useState(false)
     const [editName, setEditName] = useState(false)
     const [newName, setNewName] = useState("")
@@ -32,11 +32,19 @@ function OscillatorContainer({ loadedPatch, setLoadedPatch }) {
         })
             // .then(res => res.json())
             // .then(data => console.log(data.message))
-        }
+    }
         
-    function savePatchName() {
-        setEditName(false)
+    function savePatchName(e) {
+        e.preventDefault()
 
+        const updatedUserPatchList = userPatchList.map(patch => {
+            if (patch.id === loadedPatch.id) {
+                return ({...loadedPatch, name: newName})
+            } else {
+                return patch
+            }
+        })
+        
         fetch(`http://localhost:4000/patches/${loadedPatch.id}`, {
             method: "PATCH",
             headers: {
@@ -45,11 +53,13 @@ function OscillatorContainer({ loadedPatch, setLoadedPatch }) {
             },
             body: JSON.stringify({...loadedPatch, name: newName})
         })
-            // .then(res => res.json())
-            // .then(data => console.log(data.message))
-
+        // .then(res => res.json())
+        // .then(data => console.log(data.message))
+        
+        setEditName(false)
         setLoadedPatch({...loadedPatch, name: newName})
         setNewName("")
+        setUserPatchList(updatedUserPatchList)
     }
 
     function cancelEditName() {

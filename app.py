@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from models import User, Patch, Oscillator
 from database import db
+from pprint import pprint
 
 app = Flask(__name__)
 CORS(app)
@@ -54,6 +55,8 @@ def index_patches():
 def add_patch():
     data = request.get_json()
 
+    pprint(data)
+
     patch = Patch()
     patch_oscillators = []
 
@@ -71,11 +74,10 @@ def add_patch():
 
     patch.name = data['name']
     patch.oscillators = patch_oscillators
+    patch.user = data['creator']
 
-    print(patch_oscillators)
-
-    # db.session.add(patch)
-    # db.session.commit()
+    db.session.add(patch)
+    db.session.commit()
 
     return make_response(jsonify({"message": "new patch created"}), 200)
 

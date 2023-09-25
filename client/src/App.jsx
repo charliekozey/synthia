@@ -1,9 +1,7 @@
 function todo() {
   // NOW DOING:
-  // fix audio issues
 
   // TODO:
-  // add new patch
   // social patch info
   // user login
   // remove unused gain node on note end
@@ -282,6 +280,8 @@ function App() {
         <OscillatorContainer
           loadedPatch={loadedPatch}
           setLoadedPatch={setLoadedPatch}
+          userPatchList={userPatchList}
+          setUserPatchList={setUserPatchList}
         />}
       <h2>User Patches</h2>
       <PatchBank
