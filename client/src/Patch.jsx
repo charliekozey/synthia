@@ -7,15 +7,21 @@ function Patch({ patch, setLoadedPatch, updateNodesRef }) {
         setLoadedPatch(patch)
     }
 
-    // console.log(patch)
+    console.log(patch)
     
     return (
         <div className="patch-card" onClick={handleClick}>
-            <span>{patch.name} | </span>
-            <span className="patch-info">
-                <em>by {patch.creator.name} </em> 
-                {patch.favorited_by && <span> | ⭐️ {patch.favorited_by.length}</span>}
+            { patch && patch.creator ? 
+            <span>
+                <span>{patch.name} | </span>   
+                <span className="patch-info">
+                    <em>by {patch.creator.name} </em> 
+                    {patch.favorites && <span> | ⭐️ {patch.favorites.length}</span>}
+                </span>
             </span>
+            :
+            null
+            }
         </div>
     )
 }
