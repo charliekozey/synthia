@@ -1,7 +1,8 @@
-from flask import Flask, make_response, jsonify, request
+from flask import Flask, make_response, jsonify, request, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
+from flask_restful import Resource, Api
 from models import User, Patch, Oscillator
 from database import db
 from pprint import pprint
@@ -10,10 +11,40 @@ app = Flask(__name__)
 CORS(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/new-synthia'
+app.secret_key = b'\xfc\xceRXDr\t]3\xed\x0f\x8e\xadg\xcb<'
 
 migrate = Migrate(app, db)
+api = Api(app)
 
 db.init_app(app)
+
+class Login(Resource):
+    def post(self):
+        name = request.get_json()['name']
+        user = User.query.filter(User.name == name).first()
+        
+        session['user_id'] = user.id
+        print(session['user_id'])
+
+        # if user is None:
+        #     user = User(name=request.json['name'])
+        #     db.session.add(user)
+        #     db.session.commit()
+            
+        return user.to_dict(), 201
+
+class CheckSession(Resource):
+    def get(self):
+        user_id = session.get('user_id')
+        
+        print(session.get('user_id'))
+        if user_id:
+            print("found a user")
+            user = User.query.filter(User.id == user_id).first()
+            return user.to_dict(), 200
+        else:
+            return {'message': '401: Not Authorized'}, 401
+
 
 @app.route('/')
 def hello():
@@ -54,8 +85,6 @@ def index_patches():
 @app.post('/patches')
 def add_patch():
     data = request.get_json()
-
-    pprint(data)
 
     patch = Patch()
     patch_oscillators = []
@@ -110,6 +139,9 @@ def update_patch(id):
 
     return jsonify({"message": f"Patch updated successfully"}), 200
 
+api.add_resource(Login, '/login')
+api.add_resource(CheckSession, '/check_session')
+
 
 if __name__ == '__main__':
-    app.run(port=4000, debug=True)
+    app.run(port=5555, debug=True)

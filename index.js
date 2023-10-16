@@ -68,7 +68,7 @@ const oscillators = []
 // global nodes array stores the state of OscillatorNodes and GainNodes (linked in pairs)
 const nodes = []
 
-fetch("http://localhost:4000/patches")
+fetch("http://localhost:5555/patches")
 .then(res => res.json())
 .then(data => initializePatchList(data))
 
@@ -214,7 +214,7 @@ function updateGain(e, gainToUpdate, oscId) {
     gainToUpdate = parseFloat(e.target.value)
     // console.log(gainToUpdate)
 
-    fetch(`http://localhost:4000/oscillators/${oscId}`, {
+    fetch(`http://localhost:5555/oscillators/${oscId}`, {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json",

@@ -1,9 +1,9 @@
 function todo() {
   // NOW DOING:
+  // user login
 
   // TODO:
   // social patch info
-  // user login
   // remove unused gain node on note end
   // waveform manipulation (asdr) for individual oscillators
   // gain sliders not working right; i think there's an extra node hanging out somewhere
@@ -89,13 +89,15 @@ function App() {
     // On page load, focus div with keyup/keydown listeners attached
     ref.current.focus()
 
-    fetch("http://localhost:4000/users")
-      .then(res => res.json())
-      .then(data => {
-        setUser(data[0])
+    fetch("http://localhost:5555/check_session")
+      .then(res => {
+        if (res.ok) {
+          response.json()
+          .then(user => setUser(user))
+        }
       })
       
-    fetch("http://localhost:4000/patches")
+    fetch("http://localhost:5555/patches")
       .then(res => res.json())
       .then(data => {
         setGlobalPatchList(data)
@@ -237,7 +239,7 @@ function App() {
     gainToUpdate = parseFloat(e.target.value)
     // console.log(gainToUpdate)
 
-    fetch(`http://localhost:4000/oscillators/${oscId}`, {
+    fetch(`http://localhost:5555/oscillators/${oscId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -275,7 +277,7 @@ function App() {
 
   return (
     <div id="main" ref={ref} tabIndex={0} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
-      <Header user={user} />
+      <Header user={user} setUser={setUser} />
       {loadedPatch &&
         <OscillatorContainer
           loadedPatch={loadedPatch}

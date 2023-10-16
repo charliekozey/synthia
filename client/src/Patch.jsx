@@ -7,7 +7,7 @@ function Patch({ patch, setLoadedPatch, updateNodesRef }) {
         setLoadedPatch(patch)
     }
 
-    console.log(patch)
+    // console.log(patch)
     
     return (
         <div className="patch-card" onClick={handleClick}>
