@@ -12,6 +12,7 @@ function Header({ user, setUser }) {
 
         fetch("http://localhost:5555/login", {
             method: "POST",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json"
             },
@@ -26,6 +27,20 @@ function Header({ user, setUser }) {
         })
     }
 
+    function logOut(e) {
+        fetch("http://localhost:5555/logout", {
+            method: "DELETE",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+       .then(res => res.json())
+       .then(message => console.log(message))
+
+       setUser(null)
+    }
+
     return (
         <>
             <header id="header">
@@ -34,7 +49,7 @@ function Header({ user, setUser }) {
                     user ?
                         <>
                             <h2 id="user-name-display">logged in as {user.name}</h2>
-                            <button>log out</button>
+                            <button onClick={logOut}>log out</button>
                         </>
                         :
                         <>

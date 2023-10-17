@@ -6,12 +6,12 @@ from flask_restful import Resource, Api
 from models import User, Patch, Oscillator
 from database import db
 from pprint import pprint
-
+ 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/new-synthia'
 app.secret_key = b'\xfc\xceRXDr\t]3\xed\x0f\x8e\xadg\xcb<'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/new-synthia'
 
 migrate = Migrate(app, db)
 api = Api(app)
@@ -24,7 +24,7 @@ class Login(Resource):
         user = User.query.filter(User.name == name).first()
         
         session['user_id'] = user.id
-        print(session['user_id'])
+        print("USER ID:", session['user_id'])
 
         # if user is None:
         #     user = User(name=request.json['name'])
@@ -33,11 +33,16 @@ class Login(Resource):
             
         return user.to_dict(), 201
 
+class Logout(Resource):
+    def delete(self):
+        session['user_id'] = None
+        return {'message': 'Logged out'}, 200
+
 class CheckSession(Resource):
     def get(self):
         user_id = session.get('user_id')
         
-        print(session.get('user_id'))
+        print(user_id)
         if user_id:
             print("found a user")
             user = User.query.filter(User.id == user_id).first()
@@ -45,10 +50,39 @@ class CheckSession(Resource):
         else:
             return {'message': '401: Not Authorized'}, 401
 
+class IndexPatch(Resource):
+    def get(self):
+        patches = Patch.query.order_by(Patch.id).all()
+        patch_dicts = [patch.to_dict() for patch in patches]
 
-@app.route('/')
-def hello():
-    return "Hello, World!"
+        return make_response(jsonify(patch_dicts), 200)
+
+    def post(self):
+        data = request.get_json()
+
+        patch = Patch()
+        patch_oscillators = []
+
+        for osc in data['oscillators']:
+            new_osc = Oscillator(
+                osc_type = osc['osc_type'],
+                gain = osc['gain'],
+                attack = osc['attack'],
+                decay = osc['decay'],
+                sustain = osc['sustain'],
+                release = osc['release']
+            )
+            print(osc)
+            patch_oscillators.append(new_osc)
+
+        patch.name = data['name']
+        patch.oscillators = patch_oscillators
+        patch.user = data['creator']
+
+        db.session.add(patch)
+        db.session.commit()
+
+        return make_response(jsonify({"message": "new patch created"}), 200)
 
 
 @app.get('/users')
@@ -72,43 +106,6 @@ def index_oscillators():
     osc_dicts = [osc.to_dict() for osc in oscillators]
 
     return make_response(jsonify(osc_dicts), 200)
-
-
-@app.get('/patches')
-def index_patches():
-    patches = Patch.query.order_by(Patch.id).all()
-    patch_dicts = [patch.to_dict() for patch in patches]
-
-    return make_response(jsonify(patch_dicts), 200)
-
-
-@app.post('/patches')
-def add_patch():
-    data = request.get_json()
-
-    patch = Patch()
-    patch_oscillators = []
-
-    for osc in data['oscillators']:
-        new_osc = Oscillator(
-            osc_type = osc['osc_type'],
-            gain = osc['gain'],
-            attack = osc['attack'],
-            decay = osc['decay'],
-            sustain = osc['sustain'],
-            release = osc['release']
-        )
-        print(osc)
-        patch_oscillators.append(new_osc)
-
-    patch.name = data['name']
-    patch.oscillators = patch_oscillators
-    patch.user = data['creator']
-
-    db.session.add(patch)
-    db.session.commit()
-
-    return make_response(jsonify({"message": "new patch created"}), 200)
 
 
 @app.patch('/patches/<int:id>')
@@ -140,7 +137,9 @@ def update_patch(id):
     return jsonify({"message": f"Patch updated successfully"}), 200
 
 api.add_resource(Login, '/login')
+api.add_resource(Logout, '/logout')
 api.add_resource(CheckSession, '/check_session')
+api.add_resource(IndexPatch, '/patches')
 
 
 if __name__ == '__main__':

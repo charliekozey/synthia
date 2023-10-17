@@ -46,7 +46,7 @@ function PatchBank({ patchList, setPatchList, setLoadedPatch, setNodes, user, ba
             ]
         }
 
-        fetch("http://localhost:5555/patches", {
+        fetch("/patches", {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",

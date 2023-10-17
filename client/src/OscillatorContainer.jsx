@@ -22,7 +22,7 @@ function OscillatorContainer({ loadedPatch, setLoadedPatch,  userPatchList, setU
         // the slider values from each osc have been updating the loadedPatch in state
         // when this function runs, we set the new patches and the backend updates
 
-        fetch(`http://localhost:5555/patches/${loadedPatch.id}`, {
+        fetch(`/patches/${loadedPatch.id}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -45,7 +45,7 @@ function OscillatorContainer({ loadedPatch, setLoadedPatch,  userPatchList, setU
             }
         })
         
-        fetch(`http://localhost:5555/patches/${loadedPatch.id}`, {
+        fetch(`/patches/${loadedPatch.id}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",

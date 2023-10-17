@@ -89,11 +89,14 @@ function App() {
     // On page load, focus div with keyup/keydown listeners attached
     ref.current.focus()
 
-    fetch("http://localhost:5555/check_session")
+    fetch("http://localhost:5555/check_session", {credentials: "include"})
       .then(res => {
         if (res.ok) {
-          response.json()
-          .then(user => setUser(user))
+          res.json()
+          .then(user => {
+            console.log(user)
+            setUser(user)
+          })
         }
       })
       
@@ -103,7 +106,6 @@ function App() {
         setGlobalPatchList(data)
         setLoadedPatch(data[0])
       })
-
   }, [])
 
   useEffect(() => {
@@ -239,7 +241,7 @@ function App() {
     gainToUpdate = parseFloat(e.target.value)
     // console.log(gainToUpdate)
 
-    fetch(`http://localhost:5555/oscillators/${oscId}`, {
+    fetch(`/oscillators/${oscId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
