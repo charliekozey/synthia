@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Oscillator from './Oscillator'
 
-function OscillatorContainer({ loadedPatch, setLoadedPatch,  userPatchList, setUserPatchList }) {
+function OscillatorContainer({ loadedPatch, setLoadedPatch,  userPatchList, setUserPatchList, globalPatchList, setGlobalPatchList }) {
     const [isModified, setIsModified] = useState(false)
     const [editName, setEditName] = useState(false)
     const [newName, setNewName] = useState("")
@@ -44,8 +44,16 @@ function OscillatorContainer({ loadedPatch, setLoadedPatch,  userPatchList, setU
                 return patch
             }
         })
+
+        const updatedGlobalPatchList = globalPatchList.map(patch => {
+            if (patch.id === loadedPatch.id) {
+                return ({...loadedPatch, name: newName})
+            } else {
+                return patch
+            }
+        })
         
-        fetch(`/patches/${loadedPatch.id}`, {
+        fetch(`http://localhost:5555/patches/${loadedPatch.id}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -60,6 +68,7 @@ function OscillatorContainer({ loadedPatch, setLoadedPatch,  userPatchList, setU
         setLoadedPatch({...loadedPatch, name: newName})
         setNewName("")
         setUserPatchList(updatedUserPatchList)
+        setGlobalPatchList(updatedGlobalPatchList)
     }
 
     function cancelEditName() {

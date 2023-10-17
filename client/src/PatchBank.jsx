@@ -3,8 +3,6 @@ import Patch from './Patch'
 
 function PatchBank({ patchList, setPatchList, setLoadedPatch, setNodes, user, bankType, updateNodesRef }) {
 
-    // console.log(bankType)
-
     function toggleInput(e) {
         setShowInput(show => !show)
     }
@@ -15,6 +13,7 @@ function PatchBank({ patchList, setPatchList, setLoadedPatch, setNodes, user, ba
         const newPatch = {
             "name": "new patch",
             "creator": user,
+            "creator_id": user.id,
             "oscillators": [
                 {
                     "attack": 0.2,
@@ -46,7 +45,7 @@ function PatchBank({ patchList, setPatchList, setLoadedPatch, setNodes, user, ba
             ]
         }
 
-        fetch("/patches", {
+        fetch("http://localhost:5555/patches", {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",
@@ -54,11 +53,11 @@ function PatchBank({ patchList, setPatchList, setLoadedPatch, setNodes, user, ba
             },
             body: JSON.stringify(newPatch)
         })
-
-        setLoadedPatch(newPatch)
-
-        // console.log(patchList)
-        setPatchList([...patchList, newPatch])
+        .then(res => res.json())
+        .then(data => {
+            setLoadedPatch(data)
+            setPatchList([...patchList, newPatch])
+        })
     }
 
     return (

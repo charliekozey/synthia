@@ -1,6 +1,6 @@
 function todo() {
   // NOW DOING:
-  // user login
+  // fix broken post/patch
 
   // TODO:
   // social patch info
@@ -96,6 +96,7 @@ function App() {
           .then(user => {
             console.log(user)
             setUser(user)
+            setLoadedPatch(user.patches[0])
           })
         }
       })
@@ -114,6 +115,8 @@ function App() {
     if (user) {
       setUserPatchList(user.patches)
       setLoadedPatch(user.patches[0])
+    } else {
+      setUserPatchList([])
     }
     // console.log("user changed")
 
@@ -286,6 +289,8 @@ function App() {
           setLoadedPatch={setLoadedPatch}
           userPatchList={userPatchList}
           setUserPatchList={setUserPatchList}
+          globalPatchList={globalPatchList}
+          setGlobalPatchList={setGlobalPatchList}
         />}
       <h2>User Patches</h2>
       <PatchBank

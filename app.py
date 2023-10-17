@@ -70,7 +70,8 @@ class IndexPatch(Resource):
                 attack = osc['attack'],
                 decay = osc['decay'],
                 sustain = osc['sustain'],
-                release = osc['release']
+                release = osc['release'],
+                number = osc['number'],
             )
             print(osc)
             patch_oscillators.append(new_osc)
@@ -78,12 +79,40 @@ class IndexPatch(Resource):
         patch.name = data['name']
         patch.oscillators = patch_oscillators
         patch.user = data['creator']
+        patch.creator_id = data['creator_id']
 
         db.session.add(patch)
         db.session.commit()
 
-        return make_response(jsonify({"message": "new patch created"}), 200)
+        return make_response(jsonify(patch.to_dict()), 200)
 
+class ShowPatch(Resource):
+    def patch(self, id):
+        patch = Patch.query.get(id)
+
+        if patch is None:
+            return make_response(jsonify({"message": "Patch not found"}), 404)
+
+        data = request.get_json()   
+
+        if 'name' in data:
+            patch.name = data['name']
+        
+        if 'oscillators' in data:
+            for patchOsc in patch.oscillators:
+                for dataOsc in data['oscillators']:
+                    if patchOsc.number == dataOsc['number']:
+                        patchOsc.osc_type = dataOsc['osc_type']
+                        patchOsc.gain = dataOsc['gain']
+                        patchOsc.attack = dataOsc['attack']
+                        patchOsc.decay = dataOsc['decay']
+                        patchOsc.sustain = dataOsc['sustain']
+                        patchOsc.release = dataOsc['release']
+                    
+        db.session.add(patch)
+        db.session.commit()
+
+        return make_response(jsonify(patch.to_dict()), 200)
 
 @app.get('/users')
 def index_users():
@@ -92,13 +121,11 @@ def index_users():
     
     return make_response(jsonify(user_dicts), 200)
 
-
 @app.get('/users/<int:id>')
 def show_user(id):
     user = User.query.get(id)
 
     return make_response(jsonify(user.to_dict()), 200)
-
 
 @app.get('/oscillators')
 def index_oscillators():
@@ -107,39 +134,11 @@ def index_oscillators():
 
     return make_response(jsonify(osc_dicts), 200)
 
-
-@app.patch('/patches/<int:id>')
-def update_patch(id):
-    patch = Patch.query.get(id)
-
-    if patch is None:
-        return jsonify({"message": "Patch not found"}), 404
-
-    data = request.get_json()
-
-    if 'name' in data:
-        patch.name = data['name']
-    
-    if 'oscillators' in data:
-        for patchOsc in patch.oscillators:
-            for dataOsc in data['oscillators']:
-                if patchOsc.number == dataOsc['number']:
-                    patchOsc.osc_type = dataOsc['osc_type']
-                    patchOsc.gain = dataOsc['gain']
-                    patchOsc.attack = dataOsc['attack']
-                    patchOsc.decay = dataOsc['decay']
-                    patchOsc.sustain = dataOsc['sustain']
-                    patchOsc.release = dataOsc['release']
-                
-    db.session.add(patch)
-    db.session.commit()
-
-    return jsonify({"message": f"Patch updated successfully"}), 200
-
 api.add_resource(Login, '/login')
 api.add_resource(Logout, '/logout')
 api.add_resource(CheckSession, '/check_session')
 api.add_resource(IndexPatch, '/patches')
+api.add_resource(ShowPatch, '/patches/<int:id>')
 
 
 if __name__ == '__main__':

@@ -6,8 +6,6 @@ function Patch({ patch, setLoadedPatch, updateNodesRef }) {
         updateNodesRef([])
         setLoadedPatch(patch)
     }
-
-    // console.log(patch)
     
     return (
         <div className="patch-card" onClick={handleClick}>
