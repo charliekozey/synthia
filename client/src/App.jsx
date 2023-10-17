@@ -244,7 +244,7 @@ function App() {
     gainToUpdate = parseFloat(e.target.value)
     // console.log(gainToUpdate)
 
-    fetch(`/oscillators/${oscId}`, {
+    fetch(`http://localhost:5555/oscillators/${oscId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
