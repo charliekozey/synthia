@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 
 function Header({ user, setUser }) {
-    const [username, setUsername] = useState("")
+    const [loginData, setLoginData] = useState({})
 
     function handleChange(e) {
-        setUsername(e.target.value)
+        const {name, value} = e.target
+        setLoginData({...loginData, [name]: value})
     }
 
     function logIn(e) {
@@ -17,7 +18,7 @@ function Header({ user, setUser }) {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                name: username
+                name: loginData.username
             })
         })
         .then(res => res.json())
@@ -56,6 +57,7 @@ function Header({ user, setUser }) {
                             <h2 id="user-name-display">playing as guest</h2>
                             <form onSubmit={logIn}>
                                 <input type="text" name="username" placeholder="username" onChange={handleChange}></input>
+                                <input type="password" name="password" placeholder="password" onChange={handleChange}></input>
                                 <input type="submit" value="log in"></input>
                             </form>
                         </>
