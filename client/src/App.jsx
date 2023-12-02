@@ -91,7 +91,7 @@ function App() {
 
     fetch("http://localhost:5555/check_session", {credentials: "include"})
       .then(res => {
-        if (res.ok) {
+        if (res.ok) {0
           res.json()
           .then(user => {
             console.log(user)
