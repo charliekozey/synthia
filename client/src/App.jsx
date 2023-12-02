@@ -85,21 +85,25 @@ function App() {
 
   console.log(audioContext.baseLatency)
 
+  // check session and load global patches
   useEffect(() => {
     // On page load, focus div with keyup/keydown listeners attached
     ref.current.focus()
 
-    fetch("http://localhost:5555/check_session", {credentials: "include"})
-      .then(res => {
-        if (res.ok) {0
-          res.json()
-          .then(user => {
-            console.log(user)
-            setUser(user)
-            setLoadedPatch(user.patches[0])
-          })
-        }
-      })
+    // fetch("http://localhost:5555/check_session", {credentials: "include"})
+    //   // .then(res => {
+    //   //   console.log(res.json())
+    //   //   if (res.ok) {
+    //   //     res.json()
+    //   //     .then(user => {
+    //   //       console.log(user)
+    //   //       setUser(user)
+    //   //       setLoadedPatch(user.patches[0])
+    //   //     })
+    //   //   }
+    //   // })
+    //   .then(res => res.json())
+    //   .then(data => console.log(data))
       
     fetch("http://localhost:5555/patches")
       .then(res => res.json())
@@ -109,6 +113,7 @@ function App() {
       })
   }, [])
 
+  // load user patches
   useEffect(() => {
     // Any time user changes, get user's patch list and set loaded patch to user's first patch.
     // (If there is a user in state.)

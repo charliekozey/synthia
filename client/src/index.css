@@ -1,12 +1,18 @@
+:root {
+    --background: #112;
+    --block: #223;
+    --text: #9dd;
+}
+
 body {
     max-width: 1280px;
     margin: 0 auto;
     padding: 1rem;
     /* text-shadow: 1px 1px magenta; */
-    color: rgb(183, 214, 214);
+    color: var(--text);
     font-family: 'Andale Mono', monospace;
     font-size: 14pt;
-    background-color: #223;
+    background-color: var(--background);
 }
 
 button {
@@ -26,7 +32,7 @@ input {
     cursor: pointer;
     padding: 7px;
     margin: 5px 0;
-    background-color: #334;
+    background-color: var(--block);
 }
 
 #main {
@@ -49,7 +55,7 @@ input {
 }
 
 #how-to-play {
-    background-color: #334;
+    background-color:var(--block);
     padding: 20px;
 }
 
@@ -59,7 +65,7 @@ input {
 }
 
 #oscillator-container {
-    background-color: #334;
+    background-color: var(--block);
     padding: 30px 20px;
     margin: 20px 0;
 }

@@ -2,8 +2,7 @@ import React, { useState } from 'react'
 
 function Header({ user, setUser }) {
     const [loginData, setLoginData] = useState({})
-    const [showLoginForm, setShowLoginForm] = useState(false)
-    const [showSignupForm, setShowSignupForm] = useState(false)
+    const [authMode, setAuthMode] = useState(null)
     const [showHowToPlay, setshowHowToPlay] = useState(false)
 
     function handleChange(e) {
@@ -11,24 +10,31 @@ function Header({ user, setUser }) {
         setLoginData({ ...loginData, [name]: value })
     }
 
-    function logIn(e) {
+    function authenticate(e) {
         e.preventDefault()
 
-        fetch("http://localhost:5555/login", {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                name: loginData.username
+        if (authMode == "log in") {
+            fetch("http://localhost:5555/login", {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: loginData.username
+                })
             })
-        })
-            .then(res => res.json())
-            .then(data => {
-                console.log(data)
-                setUser(data)
-            })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data)
+                    setUser(data)
+                })
+        }
+
+        // if (authMode == "sign up") {
+        // ...
+        // }
+
     }
 
     function logOut(e) {
@@ -61,21 +67,22 @@ function Header({ user, setUser }) {
                         :
                         <div>
                             {
-                                showLoginForm ?
+                                authMode ?
                                     <>
                                         <span>
-                                            <form onSubmit={logIn}>
+                                            <form onSubmit={authenticate}>
                                                 <input type="text" name="username" placeholder="username" onChange={handleChange}></input>
                                                 <input type="password" name="password" placeholder="password" onChange={handleChange}></input>
-                                                <input type="submit" value="log in"></input>
-                                                <button onClick={() => setShowLoginForm(false)}>cancel</button>
+                                                <input type="submit" value={`${authMode}`}></input>
+                                                <button onClick={() => setAuthMode(null)}>cancel</button>
                                             </form>
                                         </span>
                                     </>
                                     :
                                     <>
                                         <span id="user-name-display">playing as guest</span>
-                                        <button onClick={() => setShowLoginForm(true)}>log in</button>
+                                        <button onClick={() => setAuthMode("log in")}>log in</button>
+                                        <button onClick={() => setAuthMode("sign up")}>sign up</button>
                                     </>
                             }
                         </div>
