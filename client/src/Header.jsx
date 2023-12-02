@@ -4,6 +4,7 @@ function Header({ user, setUser }) {
     const [loginData, setLoginData] = useState({})
     const [showLoginForm, setShowLoginForm] = useState(false)
     const [showSignupForm, setShowSignupForm] = useState(false)
+    const [showHowToPlay, setshowHowToPlay] = useState(false)
 
     function handleChange(e) {
         const { name, value } = e.target
@@ -49,25 +50,27 @@ function Header({ user, setUser }) {
         <>
             <header id="header">
                 <h4>~ s y n t h i a ~</h4>
-
+                <h4 id="how-play-link" onClick={() => setshowHowToPlay(s => !s)}>how to play</h4>
 
                 {
                     user ?
                         <div>
-                            <h4 id="user-name-display">logged in as {user.name}</h4>
+                            <span id="user-name-display">logged in as {user.name}</span>
                             <button onClick={logOut}>log out</button>
                         </div>
                         :
                         <div>
                             {
                                 showLoginForm ?
-                                <>
-                                        <form onSubmit={logIn}>
-                                            <input type="text" name="username" placeholder="username" onChange={handleChange}></input>
-                                            <input type="password" name="password" placeholder="password" onChange={handleChange}></input>
-                                            <input type="submit" value="log in"></input>
-                                        </form>
-                                        <button onClick={() => setShowLoginForm(false)}>cancel</button>
+                                    <>
+                                        <span>
+                                            <form onSubmit={logIn}>
+                                                <input type="text" name="username" placeholder="username" onChange={handleChange}></input>
+                                                <input type="password" name="password" placeholder="password" onChange={handleChange}></input>
+                                                <input type="submit" value="log in"></input>
+                                                <button onClick={() => setShowLoginForm(false)}>cancel</button>
+                                            </form>
+                                        </span>
                                     </>
                                     :
                                     <>
@@ -79,19 +82,38 @@ function Header({ user, setUser }) {
                 }
 
             </header>
-            <div>
-                <pre>
+
+            { showHowToPlay ?
+                    <div id="how-to-play">
+                        <p>Welcome to synthia!</p>
+                        <p>Use your QWERTY keyboard to make sounds.</p>
+                        <p>An oscillator generates a sound wave.</p>
+                        <p>The shape of the wave determines its texture: is it smooth-sounding, harsh, spiky?</p>
+                        <p>Combine oscillators to create custom sounds.</p>
+                        <p>Adjust the sliders to change the sounds.</p>
+                        <p>Gain changes the loudness of an oscillator.</p>
+                        <p>Attack changes the amount of time between pressing a key and reaching peak volume.</p>
+                        <p>Release changes the amount of time the sound lingers after you stop pressing the key.</p>
+                        <p>A patch is a saved snapshot of settings you can return to later.</p>
+                        <p>Log in or create an account to save your own patches.</p>
+                        <p>Explore sounds made by other users in <em>global patches</em>.</p>
+                        <pre>
                     {`
 ------------------------------------------------
 black keys:      [w][e]  [t][y][u]   [o][p]
 white keys:    [a][s][d][f][g][h][j][k][l][;][']
-octave up/down: [z][x]
+octave down/up: [z][x]
 
 press escape to stop all sound
 ------------------------------------------------
 `}
-                </pre>
-            </div>
+                        </pre>
+                    </div>
+                    :
+                    <>
+                    </>
+                }
+
         </>
     )
 }

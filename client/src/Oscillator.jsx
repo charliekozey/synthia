@@ -30,10 +30,17 @@ function Oscillator({ osc, loadedPatch, setLoadedPatch, setIsModified }) {
     }
 
     return (
-        <>
+        <div>
+            
+            <br></br>
+            <br></br>
+
             <em>
-                <h3 id="osc-name">Osc {osc.number}</h3>
+                <span id="osc-name">Osc {osc.number}</span>
             </em>
+            
+            <br></br>
+            <br></br>
 
             <label htmlFor={`osc_type`}>wave:</label>
             <select 
@@ -48,6 +55,8 @@ function Oscillator({ osc, loadedPatch, setLoadedPatch, setIsModified }) {
                 <option value="square">square</option>
             </select>
 
+            <br></br>
+
             <label htmlFor="gain">gain:</label>
             <input
                 name="gain"
@@ -58,6 +67,8 @@ function Oscillator({ osc, loadedPatch, setLoadedPatch, setIsModified }) {
                 value={oscValues.gain}
                 onChange={e => updateOscValue(e)}
             ></input>
+
+            <br></br>
 
             <label htmlFor="attack">attack:</label>
             <input
@@ -70,6 +81,8 @@ function Oscillator({ osc, loadedPatch, setLoadedPatch, setIsModified }) {
                 onChange={e => updateOscValue(e)}
             ></input>
 
+            <br></br>
+
             <label htmlFor="release">release:</label>
             <input
                 name="release"
@@ -81,7 +94,7 @@ function Oscillator({ osc, loadedPatch, setLoadedPatch, setIsModified }) {
                 onChange={e => updateOscValue(e)}
             ></input>
 
-        </>
+        </div>
     )
 }
 

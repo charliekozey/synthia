@@ -11,14 +11,22 @@ body {
 
 button {
     cursor: pointer;
+    margin-left: 10px;
+}
+
+input {
+    margin: 5px 0;
+}
+
+.patch-bank {
+    width: 48%;
 }
 
 .patch-card {
     cursor: pointer;
-    width: 600px;
     padding: 7px;
-    margin: 5px;
-    background-color: #455;
+    margin: 5px 0;
+    background-color: #334;
 }
 
 #main {
@@ -32,6 +40,31 @@ button {
     height: 60px;
 }
 
+#how-play-link {
+    cursor: pointer;
+}
+
 #user-name-display {
     padding: 0 15px 0 0;
+}
+
+#how-to-play {
+    background-color: #334;
+    padding: 20px;
+}
+
+#osc-flexbox {
+    display: flex;
+    justify-content: space-around;
+}
+
+#oscillator-container {
+    background-color: #334;
+    padding: 30px 20px;
+    margin: 20px 0;
+}
+
+#patch-container {
+    display: flex;
+    justify-content: space-between;
 }

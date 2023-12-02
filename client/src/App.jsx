@@ -292,26 +292,39 @@ function App() {
           globalPatchList={globalPatchList}
           setGlobalPatchList={setGlobalPatchList}
         />}
-      <h2>User Patches</h2>
+
+      <div id="patch-container">
       <PatchBank
-        patchList={userPatchList}
-        setPatchList={setUserPatchList}
-        setLoadedPatch={setLoadedPatch}
-        updateNodesRef={updateNodesRef}
-        nodesRef={nodesRef}
-        // setNodes={setNodes}
-        user={user}
-        bankType="user"
-      />
-      <h2>Global Patches</h2>
-      <PatchBank
-        patchList={globalPatchList}
-        setPatchList={setGlobalPatchList}
-        setLoadedPatch={setLoadedPatch}
-        updateNodesRef={updateNodesRef}
-        // setNodes={setNodes}
-        bankType="global"
-      />
+          patchList={globalPatchList}
+          setPatchList={setGlobalPatchList}
+          setLoadedPatch={setLoadedPatch}
+          updateNodesRef={updateNodesRef}
+          // setNodes={setNodes}
+          bankType="global"
+        />
+        {
+          user ?
+          <>
+            <PatchBank
+              patchList={userPatchList}
+              setPatchList={setUserPatchList}
+              setLoadedPatch={setLoadedPatch}
+              updateNodesRef={updateNodesRef}
+              nodesRef={nodesRef}
+              // setNodes={setNodes}
+              user={user}
+              bankType="user"
+            />
+          </>
+          :
+          <div>
+            <h2>user patches</h2>
+            <p>
+              log in to save your own patches!
+            </p>
+          </div>
+        }
+      </div>
     </div>
   )
 }

@@ -78,7 +78,7 @@ function OscillatorContainer({ loadedPatch, setLoadedPatch,  userPatchList, setU
 
 
     return (
-        <>
+        <div id="oscillator-container">
             {
                 editName ?
                     <>
@@ -96,24 +96,27 @@ function OscillatorContainer({ loadedPatch, setLoadedPatch,  userPatchList, setU
                     </>
                 :
                     <>
-                        <h1>{loadedPatch.name}</h1>
-                        <button onClick={() => setEditName(true)}>edit name</button>
+                        <span>{loadedPatch.name}</span>
                     </>
             }
-
-            {oscList.sort((a, b) => {
-                return a.props.osc.number - b.props.osc.number
-            })}
-
-            <br></br>
             {
-                isModified ?  
-                    <button onClick={savePatchSettings}>Save changes</button> 
+                isModified ?
+                <>
+                    <span>(modified)</span>  
+                    <button onClick={savePatchSettings}>save changes</button> 
+                </>
                 : 
-                    <button onClick={savePatchSettings}>Patch saved</button>
+                <></>
             }
+            <span><button onClick={() => setEditName(true)}>edit name</button></span>
+            <div id="osc-flexbox">
 
-        </>
+                {oscList.sort((a, b) => {
+                    return a.props.osc.number - b.props.osc.number
+                })}
+                
+            </div>
+        </div>
     )
 }
 
