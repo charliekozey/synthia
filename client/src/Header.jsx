@@ -2,10 +2,12 @@ import React, { useState } from 'react'
 
 function Header({ user, setUser }) {
     const [loginData, setLoginData] = useState({})
+    const [showLoginForm, setShowLoginForm] = useState(false)
+    const [showSignupForm, setShowSignupForm] = useState(false)
 
     function handleChange(e) {
-        const {name, value} = e.target
-        setLoginData({...loginData, [name]: value})
+        const { name, value } = e.target
+        setLoginData({ ...loginData, [name]: value })
     }
 
     function logIn(e) {
@@ -21,11 +23,11 @@ function Header({ user, setUser }) {
                 name: loginData.username
             })
         })
-        .then(res => res.json())
-        .then(data => {
-            console.log(data)
-            setUser(data)
-        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                setUser(data)
+            })
     }
 
     function logOut(e) {
@@ -36,34 +38,48 @@ function Header({ user, setUser }) {
                 "Content-Type": "application/json"
             }
         })
-       .then(res => res.json())
-       .then(message => console.log(message))
+            .then(res => res.json())
+            .then(message => console.log(message))
 
-       setUser(null)
+        setUser(null)
+        setShowLoginForm(false)
     }
 
     return (
         <>
             <header id="header">
-                <h1>welcome to ~ s y n t h i a ~</h1>
+                <h4>~ s y n t h i a ~</h4>
+
+
                 {
                     user ?
-                        <>
-                            <h2 id="user-name-display">logged in as {user.name}</h2>
+                        <div>
+                            <h4 id="user-name-display">logged in as {user.name}</h4>
                             <button onClick={logOut}>log out</button>
-                        </>
+                        </div>
                         :
-                        <>
-                            <h2 id="user-name-display">playing as guest</h2>
-                            <form onSubmit={logIn}>
-                                <input type="text" name="username" placeholder="username" onChange={handleChange}></input>
-                                <input type="password" name="password" placeholder="password" onChange={handleChange}></input>
-                                <input type="submit" value="log in"></input>
-                            </form>
-                        </>
+                        <div>
+                            {
+                                showLoginForm ?
+                                <>
+                                        <form onSubmit={logIn}>
+                                            <input type="text" name="username" placeholder="username" onChange={handleChange}></input>
+                                            <input type="password" name="password" placeholder="password" onChange={handleChange}></input>
+                                            <input type="submit" value="log in"></input>
+                                        </form>
+                                        <button onClick={() => setShowLoginForm(false)}>cancel</button>
+                                    </>
+                                    :
+                                    <>
+                                        <span id="user-name-display">playing as guest</span>
+                                        <button onClick={() => setShowLoginForm(true)}>log in</button>
+                                    </>
+                            }
+                        </div>
                 }
+
             </header>
-            <h2>
+            <div>
                 <pre>
                     {`
 ------------------------------------------------
@@ -75,7 +91,7 @@ press escape to stop all sound
 ------------------------------------------------
 `}
                 </pre>
-            </h2>
+            </div>
         </>
     )
 }

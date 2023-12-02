@@ -1,0 +1,37 @@
+body {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1rem;
+    /* text-shadow: 1px 1px magenta; */
+    color: rgb(183, 214, 214);
+    font-family: 'Andale Mono', monospace;
+    font-size: 14pt;
+    background-color: #223;
+}
+
+button {
+    cursor: pointer;
+}
+
+.patch-card {
+    cursor: pointer;
+    width: 600px;
+    padding: 7px;
+    margin: 5px;
+    background-color: #455;
+}
+
+#main {
+    outline: none;
+}
+
+#header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+}
+
+#user-name-display {
+    padding: 0 15px 0 0;
+}
