@@ -156,9 +156,6 @@ function App() {
         // console.log(osc.number + " activating")
         const oscNode = new OscillatorNode(audioContext, { type: osc.osc_type, frequency: keyboard.current[input].freq })
         const gainNode = new GainNode(audioContext, { gain: parseFloat(osc.gain) })
-        const typeSelect = document.getElementById(`type-select-${osc.number}`)
-        const gainSlider = document.getElementById(`gain-slider-${osc.number}`)
-        const releaseSlider = document.getElementById(`release-slider-${osc.number}`)
         const newNode = {
           osc_node: oscNode,
           gain_node: gainNode,

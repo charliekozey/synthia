@@ -95,7 +95,7 @@ function Header({ user, setUser }) {
                         <p>Welcome to synthia!</p>
                         <p>Use your QWERTY keyboard to make sounds.</p>
                         <p>An oscillator generates a sound wave.</p>
-                        <p>The shape of the wave determines its texture: is it smooth-sounding, harsh, spiky?</p>
+                        <p>The shape of the wave determines its texture: is it round, harsh, spiky?</p>
                         <p>Combine oscillators to create custom sounds.</p>
                         <p>Adjust the sliders to change the sounds.</p>
                         <p>Gain changes the loudness of an oscillator.</p>
