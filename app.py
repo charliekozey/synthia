@@ -12,6 +12,8 @@ CORS(app, supports_credentials=True)
 
 app.secret_key = b'\xfc\xceRXDr\t]3\xed\x0f\x8e\xadg\xcb<'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/new-synthia'
+app.config['SESSION_COOKIE_SAMESITE'] = "None"
+app.config['SESSION_COOKIE_SECURE'] = True
 
 migrate = Migrate(app, db)
 api = Api(app)
