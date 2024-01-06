@@ -37,12 +37,13 @@ services:
     #   - db
 
   client:
+    container_name: synthia-react-client
     build:
       context: .
       dockerfile: Dockerfile.client
     image: synthia-react-client
     ports:
-      - 3000:3000
+      - 5173:5173
 
 volumes:
   pgdata: {}
