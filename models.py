@@ -10,6 +10,7 @@ class User(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
+    password = db.Column(db.String(50), nullable=True)
     patches = db.relationship('Patch', back_populates='creator', lazy=True)
     favorites = db.relationship('Favorite', back_populates='user', cascade='all, delete-orphan')
 

@@ -14,7 +14,7 @@ function Header({ user, setUser }) {
         e.preventDefault()
 
         if (authMode == "log in") {
-            fetch("http://localhost:5555/login", {
+            fetch("http://localhost:5000/login", {
                 method: "POST",
                 credentials: "include",
                 headers: {
@@ -31,14 +31,29 @@ function Header({ user, setUser }) {
                 })
         }
 
-        // if (authMode == "sign up") {
-        // ...
-        // }
+        if (authMode == "sign up") {
+            fetch("http://localhost:5000/signup", {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: loginData.username,
+                    password: loginData.password
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data)
+                    setUser(data)
+                })
+        }
 
     }
 
     function logOut(e) {
-        fetch("http://localhost:5555/logout", {
+        fetch("http://localhost:5000/logout", {
             method: "DELETE",
             credentials: "include",
             headers: {

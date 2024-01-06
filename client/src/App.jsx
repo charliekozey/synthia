@@ -90,22 +90,21 @@ function App() {
     // On page load, focus div with keyup/keydown listeners attached
     ref.current.focus()
 
-    // fetch("http://localhost:5555/check_session", {credentials: "include"})
-    //   // .then(res => {
-    //   //   console.log(res.json())
-    //   //   if (res.ok) {
-    //   //     res.json()
-    //   //     .then(user => {
-    //   //       console.log(user)
-    //   //       setUser(user)
-    //   //       setLoadedPatch(user.patches[0])
-    //   //     })
-    //   //   }
-    //   // })
-    //   .then(res => res.json())
-    //   .then(data => console.log(data))
+    fetch("http://localhost:5000/check_session", {credentials: "include"})
+      .then(res => {
+        if (res.ok) {
+          res.json()
+          .then(user => {
+            console.log("CHECK SESSION:", user)
+            setUser(user)
+            setLoadedPatch(user.patches[0])
+          })
+        }
+      })
+      .then(res => res.json())
+      .then(data => console.log(data))
       
-    fetch("http://localhost:5555/patches")
+    fetch("http://localhost:5000/patches")
       .then(res => res.json())
       .then(data => {
         setGlobalPatchList(data)
@@ -148,10 +147,10 @@ function App() {
     if (!!loadedPatch && !keyboard.current[input].down) {
       // console.log("starting sound")
       loadedPatch.oscillators.forEach(osc => {
-        const sampleRate = audioContext.sampleRate
-        const duration = 1.0
-        const buffer = audioContext.createBuffer(1, sampleRate * duration, sampleRate)
-        const channelData = buffer.getChannelData(0)
+        // const sampleRate = audioContext.sampleRate
+        // const duration = 1.0
+        // const buffer = audioContext.createBuffer(1, sampleRate * duration, sampleRate)
+        // const channelData = buffer.getChannelData(0)
         const attackTime = parseFloat(logifyValue(osc.attack)) * 0.1
         // console.log(osc.number + " activating")
         const oscNode = new OscillatorNode(audioContext, { type: osc.osc_type, frequency: keyboard.current[input].freq })
@@ -163,11 +162,11 @@ function App() {
           osc_data: osc
         }
 
-        for (let i = 0; i < buffer.length; i++) {
-          channelData[i] = Math.sin((i / sampleRate) * 2 * Math.PI * 440); // Generate a 440Hz sine wave
-        }
+        // for (let i = 0; i < buffer.length; i++) {
+        //   channelData[i] = Math.sin((i / sampleRate) * 2 * Math.PI * 440); // Generate a 440Hz sine wave
+        // }
 
-        oscNode.buffer = buffer
+        // oscNode.buffer = buffer
         oscNode.connect(gainNode)
         gainNode.gain.setValueAtTime(0.0000000001, audioContext.currentTime)
         gainNode.gain.linearRampToValueAtTime(parseFloat(osc.gain) * 0.1, audioContext.currentTime + attackTime)
@@ -185,7 +184,7 @@ function App() {
 
   function stopSound(e) {
 
-    const input = e.key
+    const input = e.key 
     // console.log("key down?", keyboard.current[input].down)
 
     if (Object.keys(keyboard.current).includes(input)) {
@@ -246,7 +245,7 @@ function App() {
     gainToUpdate = parseFloat(e.target.value)
     // console.log(gainToUpdate)
 
-    fetch(`http://localhost:5555/oscillators/${oscId}`, {
+    fetch(`http://localhost:5000/oscillators/${oscId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -325,7 +324,7 @@ function App() {
               log in to save your own patches!
             </p>
           </div>
-        }
+        } 
       </div>
     </div>
   )

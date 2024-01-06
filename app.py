@@ -6,12 +6,14 @@ from flask_restful import Resource, Api
 from models import User, Patch, Oscillator
 from database import db
 from pprint import pprint
- 
+from os import environ
+from seed import seed_data
+
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 
 app.secret_key = b'\xfc\xceRXDr\t]3\xed\x0f\x8e\xadg\xcb<'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/new-synthia'
+app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URL')
 app.config['SESSION_COOKIE_SAMESITE'] = "None"
 app.config['SESSION_COOKIE_SECURE'] = True
 
@@ -19,6 +21,11 @@ migrate = Migrate(app, db)
 api = Api(app)
 
 db.init_app(app)
+
+
+class IndexResource(Resource):
+    def get(self):
+        return {'message': 'Hello, this is the base URL!'}
 
 class Login(Resource):
     def post(self):
@@ -32,6 +39,19 @@ class Login(Resource):
         #     user = User(name=request.json['name'])
         #     db.session.add(user)
         #     db.session.commit()
+            
+        return user.to_dict(), 201
+
+class Signup(Resource):
+    def post(self):
+        name = request.get_json()['name']
+        password = request.get_json()['password']
+        user = User(name = name, password = password)
+        db.session.add(user)
+        db.session.commit()
+        
+        session['user_id'] = user.id
+        print("SIGNUP USER ID:", session['user_id'])
             
         return user.to_dict(), 201
 
@@ -136,12 +156,21 @@ def index_oscillators():
 
     return make_response(jsonify(osc_dicts), 200)
 
+@app.route('/')
+def index():
+    return 'Hello, this is the base URL!'
+
+api.add_resource(Signup, '/signup')
 api.add_resource(Login, '/login')
 api.add_resource(Logout, '/logout')
 api.add_resource(CheckSession, '/check_session')
 api.add_resource(IndexPatch, '/patches')
 api.add_resource(ShowPatch, '/patches/<int:id>')
+api.add_resource(IndexResource, '/')
 
 
-if __name__ == '__main__':
-    app.run(port=5555, debug=True)
+# if __name__ == '__main__':
+#     with app.app_context():
+#         db.create_all()
+#         seed_data()
+    # app.run(host="0.0.0.0", port=5000, debug=True)
