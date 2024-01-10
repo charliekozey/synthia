@@ -2,6 +2,9 @@ function todo() {
   // NOW DOING:
   // fix broken post/patch
 
+  // BUGS:
+  // no sound after saving patch edit
+
   // TODO:
   // social patch info
   // remove unused gain node on note end
@@ -52,6 +55,7 @@ import Header from './Header'
 import PatchBank from './PatchBank'
 import OscillatorContainer from './OscillatorContainer'
 import './App.css'
+import * as Tone from 'tone'
 
 function App() {
   const [oscillators, setOscillators] = useState([])
@@ -140,76 +144,100 @@ function App() {
     nodesRef.current = updatedNodes
   }
 
+  // function startSound(e) {
+  //   if (e.repeat) return
+  //   const input = e.key
+
+  //   if (!!loadedPatch && !keyboard.current[input].down) {
+  //     // console.log("starting sound")
+  //     loadedPatch.oscillators.forEach(osc => {
+  //       // const sampleRate = audioContext.sampleRate
+  //       // const duration = 1.0
+  //       // const buffer = audioContext.createBuffer(1, sampleRate * duration, sampleRate)
+  //       // const channelData = buffer.getChannelData(0)
+  //       const attackTime = parseFloat(logifyValue(osc.attack)) * 0.1
+  //       // console.log(osc.number + " activating")
+  //       const oscNode = new OscillatorNode(audioContext, { type: osc.osc_type, frequency: keyboard.current[input].freq })
+  //       const gainNode = new GainNode(audioContext, { gain: parseFloat(osc.gain) })
+  //       const newNode = {
+  //         osc_node: oscNode,
+  //         gain_node: gainNode,
+  //         key_pressed: input,
+  //         osc_data: osc
+  //       }
+
+  //       // for (let i = 0; i < buffer.length; i++) {
+  //       //   channelData[i] = Math.sin((i / sampleRate) * 2 * Math.PI * 440); // Generate a 440Hz sine wave
+  //       // }
+
+  //       // oscNode.buffer = buffer
+  //       oscNode.connect(gainNode)
+  //       gainNode.gain.setValueAtTime(0.0000000001, audioContext.currentTime)
+  //       gainNode.gain.linearRampToValueAtTime(parseFloat(osc.gain) * 0.1, audioContext.currentTime + attackTime)
+  //       gainNode.connect(audioContext.destination)
+  //       oscNode.start()
+
+  //       // console.log("adding new node")
+  //       // console.log(nodesRef.current)
+  //       nodesRef.current = [...nodesRef.current, newNode]
+  //     })
+
+  //     keyboard.current[input].down = true
+  //   }
+  // }
+
+  // function stopSound(e) {
+
+  //   const input = e.key 
+  //   // console.log("key down?", keyboard.current[input].down)
+
+  //   if (Object.keys(keyboard.current).includes(input)) {
+  //     // console.log("stopping sound")
+
+  //     nodesRef.current.forEach(node => {
+  //       const releaseTime = logifyValue(node.osc_data.release)
+
+  //       if (node.key_pressed == input) {
+  //         node.gain_node.gain.setValueAtTime(node.gain_node.gain.value, audioContext.currentTime)
+  //         // node.gain_node.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.05)
+  //         node.gain_node.gain.exponentialRampToValueAtTime(0.0000000001, audioContext.currentTime + parseFloat(releaseTime))
+
+  //         setTimeout(() => {
+  //           node.gain_node.disconnect()
+  //           node.osc_node.disconnect()
+  //         }, 5000)
+  //       }
+  //     })
+  //     keyboard.current[input].down = false
+  //   }
+  //   // setTimeout(() => {
+  //   //     nodesRef.current = []
+  //   // }, 1000)
+
+  // }
+
   function startSound(e) {
-    if (e.repeat) return
-    const input = e.key
+    console.log("starting", e.key)
+    const pressedKey = e.key
 
-    if (!!loadedPatch && !keyboard.current[input].down) {
-      // console.log("starting sound")
-      loadedPatch.oscillators.forEach(osc => {
-        // const sampleRate = audioContext.sampleRate
-        // const duration = 1.0
-        // const buffer = audioContext.createBuffer(1, sampleRate * duration, sampleRate)
-        // const channelData = buffer.getChannelData(0)
-        const attackTime = parseFloat(logifyValue(osc.attack)) * 0.1
-        // console.log(osc.number + " activating")
-        const oscNode = new OscillatorNode(audioContext, { type: osc.osc_type, frequency: keyboard.current[input].freq })
-        const gainNode = new GainNode(audioContext, { gain: parseFloat(osc.gain) })
-        const newNode = {
-          osc_node: oscNode,
-          gain_node: gainNode,
-          key_pressed: input,
-          osc_data: osc
-        }
+    const sound = new Tone.MonoSynth({
+      "oscillator": {
+        "type": "triangle"
+      },
+      "envelope": {
+        "attack": 0.1
+      }
+    }).toDestination()
 
-        // for (let i = 0; i < buffer.length; i++) {
-        //   channelData[i] = Math.sin((i / sampleRate) * 2 * Math.PI * 440); // Generate a 440Hz sine wave
-        // }
+    // sound.triggerAttack("C3")
 
-        // oscNode.buffer = buffer
-        oscNode.connect(gainNode)
-        gainNode.gain.setValueAtTime(0.0000000001, audioContext.currentTime)
-        gainNode.gain.linearRampToValueAtTime(parseFloat(osc.gain) * 0.1, audioContext.currentTime + attackTime)
-        gainNode.connect(audioContext.destination)
-        oscNode.start()
-
-        // console.log("adding new node")
-        // console.log(nodesRef.current)
-        nodesRef.current = [...nodesRef.current, newNode]
-      })
-
-      keyboard.current[input].down = true
-    }
+    window.addEventListener("keyup", (e) => {
+      if (e.key == pressedKey) stopSound(e)
+    })
   }
 
   function stopSound(e) {
-
-    const input = e.key 
-    // console.log("key down?", keyboard.current[input].down)
-
-    if (Object.keys(keyboard.current).includes(input)) {
-      // console.log("stopping sound")
-
-      nodesRef.current.forEach(node => {
-        const releaseTime = logifyValue(node.osc_data.release)
-
-        if (node.key_pressed == input) {
-          node.gain_node.gain.setValueAtTime(node.gain_node.gain.value, audioContext.currentTime)
-          // node.gain_node.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.05)
-          node.gain_node.gain.exponentialRampToValueAtTime(0.0000000001, audioContext.currentTime + parseFloat(releaseTime))
-
-          setTimeout(() => {
-            node.gain_node.disconnect()
-            node.osc_node.disconnect()
-          }, 5000)
-        }
-      })
-      keyboard.current[input].down = false
-    }
-    // setTimeout(() => {
-    //     nodesRef.current = []
-    // }, 1000)
-
+    console.log("stopping", e.key)
   }
 
   function changeOctave(e) {
