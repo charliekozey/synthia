@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
-      POSTGRES_DB: new-synthia
+      POSTGRES_DB: postgres
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 1s
@@ -36,14 +36,14 @@ services:
     # links:
     #   - db
 
-  client:
-    container_name: synthia-react-client
-    build:
-      context: .
-      dockerfile: Dockerfile.client
-    image: synthia-react-client
-    ports:
-      - 5173:5173
+  # client:
+  #   container_name: synthia-react-client
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.client
+  #   image: synthia-react-client
+  #   ports:
+  #     - 5173:5173
 
 volumes:
   pgdata: {}

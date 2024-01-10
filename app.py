@@ -7,7 +7,7 @@ from models import User, Patch, Oscillator
 from database import db
 from pprint import pprint
 from os import environ
-from seed import seed_data
+# from seed import seed_data
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -17,10 +17,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URL')
 app.config['SESSION_COOKIE_SAMESITE'] = "None"
 app.config['SESSION_COOKIE_SECURE'] = True
 
+db.init_app(app)
 migrate = Migrate(app, db)
 api = Api(app)
-
-db.init_app(app)
 
 
 class IndexResource(Resource):
@@ -169,8 +168,8 @@ api.add_resource(ShowPatch, '/patches/<int:id>')
 api.add_resource(IndexResource, '/')
 
 
-# if __name__ == '__main__':
-#     with app.app_context():
-#         db.create_all()
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
 #         seed_data()
-    # app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

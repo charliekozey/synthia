@@ -52,6 +52,3 @@ class Favorite(db.Model, SerializerMixin):
     patch_id = db.Column(db.Integer, db.ForeignKey('patches.id'), nullable=False)
     user = db.relationship('User', back_populates='favorites')
     patch = db.relationship('Patch', back_populates='favorites')    
-
-if __name__ == '__main__':
-    db.create_all()
