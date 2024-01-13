@@ -321,7 +321,7 @@ function App() {
           <div>
             <h2>user patches</h2>
             <p>
-              log in to save your own patches! omgomg
+              log in to save your own patches!
             </p>
           </div>
         } 
