@@ -90,7 +90,7 @@ function App() {
     // On page load, focus div with keyup/keydown listeners attached
     ref.current.focus()
 
-    fetch("http://localhost:5000/check_session", {credentials: "include"})
+    fetch("https://synthia-flask-api.onrender.com/api/check_session", {credentials: "include"})
       .then(res => {
         if (res.ok) {
           res.json()
@@ -104,7 +104,7 @@ function App() {
       .then(res => res.json())
       .then(data => console.log(data))
       
-    fetch("http://localhost:5000/patches")
+    fetch("https://synthia-flask-api.onrender.com/api/patches")
       .then(res => res.json())
       .then(data => {
         setGlobalPatchList(data)
