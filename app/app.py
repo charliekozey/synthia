@@ -67,7 +67,7 @@ class CheckSession(Resource):
         if user_id:
             print("found a user")
             user = User.query.filter(User.id == user_id).first()
-            response = jsonify user.to_dict()
+            response = jsonify(user.to_dict())
             response.headers.add("Access-Control-Allow-Origin", "*")
             return response, 200
         else:
@@ -78,7 +78,7 @@ class IndexPatch(Resource):
         patches = Patch.query.order_by(Patch.id).all()
         patch_dicts = [patch.to_dict() for patch in patches]
 
-        response = make_response(jsonify(patch_dicts)
+        response = make_response(jsonify(patch_dicts))
         response.headers.add("Access-Control-Allow-Origin", "*")
         return response, 200
 
