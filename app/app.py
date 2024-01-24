@@ -60,6 +60,7 @@ class Logout(Resource):
         return {'message': 'Logged out'}, 200
 
 class CheckSession(Resource):
+    @cross_origin(supports_credentials=True)
     def get(self):
         user_id = session.get('user_id')
         
@@ -74,6 +75,7 @@ class CheckSession(Resource):
             return {'message': '401: Not Authorized'}, 401
 
 class IndexPatch(Resource):
+    @cross_origin(supports_credentials=True)
     def get(self):
         patches = Patch.query.order_by(Patch.id).all()
         patch_dicts = [patch.to_dict() for patch in patches]
