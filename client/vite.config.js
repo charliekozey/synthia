@@ -7,11 +7,12 @@ export default defineConfig({
   server: {
     host: true,
     port: 8000,
-    hmr: {
-      clientPort: 5173
-    },
-    watch: {
-      usePolling: true
-    }
+    // comment hmr back in for hot reload:
+    // hmr: {
+    //   clientPort: 5173
+    // },
+    // watch: {
+    //   usePolling: true
+    // }
   }
 })
