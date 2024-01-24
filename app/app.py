@@ -69,7 +69,7 @@ class CheckSession(Resource):
             print("found a user")
             user = User.query.filter(User.id == user_id).first()
             response = jsonify(user.to_dict())
-            response.headers.add("Access-Control-Allow-Origin", "*")
+            response.headers.add("Access-Control-Allow-Origin", "https://synthia-client.onrender.com/")
             return response, 200
         else:
             return {'message': '401: Not Authorized'}, 401
@@ -81,7 +81,7 @@ class IndexPatch(Resource):
         patch_dicts = [patch.to_dict() for patch in patches]
 
         response = make_response(jsonify(patch_dicts))
-        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add("Access-Control-Allow-Origin", "https://synthia-client.onrender.com/")
         return response, 200
 
     def post(self):
