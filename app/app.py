@@ -1,7 +1,7 @@
 from flask import Flask, make_response, jsonify, request, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from flask_restful import Resource, Api
 from models import User, Patch, Oscillator
 from database import db
