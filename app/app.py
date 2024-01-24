@@ -67,7 +67,9 @@ class CheckSession(Resource):
         if user_id:
             print("found a user")
             user = User.query.filter(User.id == user_id).first()
-            return user.to_dict(), 200
+            response = jsonify user.to_dict()
+            response.headers.add("Access-Control-Allow-Origin", "*")
+            return response, 200
         else:
             return {'message': '401: Not Authorized'}, 401
 
@@ -76,7 +78,9 @@ class IndexPatch(Resource):
         patches = Patch.query.order_by(Patch.id).all()
         patch_dicts = [patch.to_dict() for patch in patches]
 
-        return make_response(jsonify(patch_dicts), 200)
+        response = make_response(jsonify(patch_dicts)
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response, 200
 
     def post(self):
         data = request.get_json()
