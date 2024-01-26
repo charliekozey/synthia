@@ -90,8 +90,9 @@ function App() {
     // On page load, focus div with keyup/keydown listeners attached
     ref.current.focus()
 
-    fetch("https://synthia-flask-api:5000/check_session", {credentials: "include"})
+    fetch("https://synthia-flask-api.onrender.com/check_session", {credentials: "include"})
       .then(res => {
+        debugger
         if (res.ok) {
           res.json()
           .then(user => {
@@ -101,10 +102,13 @@ function App() {
           })
         }
       })
-      .then(res => res.json())
-      .then(data => console.log(data))
+      // .then(res => res.json())
+      // .then(data => console.log(data))
+      .catch(err => {
+        console.log(err)
+      })
       
-    fetch("https://synthia-flask-api:5000/patches")
+    fetch("https://synthia-flask-api.onrender.com/patches")
       .then(res => res.json())
       .then(data => {
         setGlobalPatchList(data)
