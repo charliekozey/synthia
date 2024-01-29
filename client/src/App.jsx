@@ -82,6 +82,7 @@ function App() {
     "'": { freq: 698, down: false },
   })
   const ref = useRef(null)
+  const API_URL = import.meta.env.VITE_API_URL
 
   console.log(audioContext.baseLatency)
 
@@ -90,9 +91,8 @@ function App() {
     // On page load, focus div with keyup/keydown listeners attached
     ref.current.focus()
 
-    fetch("https://synthia-flask-api.onrender.com/check_session", {credentials: "include"})
+    fetch(`${API_URL}/check_session`, {credentials: "include"})
       .then(res => {
-        debugger
         if (res.ok) {
           res.json()
           .then(user => {
@@ -104,11 +104,11 @@ function App() {
       })
       // .then(res => res.json())
       // .then(data => console.log(data))
-      .catch(err => {
-        console.log(err)
-      })
+      // .catch(err => {
+      //   console.log(err)
+      // })
       
-    fetch("https://synthia-flask-api.onrender.com/patches")
+    fetch(`${API_URL}/patches`)
       .then(res => res.json())
       .then(data => {
         setGlobalPatchList(data)
@@ -249,7 +249,7 @@ function App() {
     gainToUpdate = parseFloat(e.target.value)
     // console.log(gainToUpdate)
 
-    fetch(`http://localhost:5000/oscillators/${oscId}`, {
+    fetch(`${API_URL}/oscillators/${oscId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

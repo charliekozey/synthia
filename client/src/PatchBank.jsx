@@ -61,7 +61,7 @@ function PatchBank({ patchList, setPatchList, setLoadedPatch, setNodes, user, ba
     }
 
     return (
-        <div class="patch-bank">
+        <div className="patch-bank">
             <h2>{bankType} patches</h2>
             {!user && bankType == "user" && <p>log in or sign up to save patches</p>}
             {patchList.map(patch => {
