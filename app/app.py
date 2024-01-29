@@ -1,7 +1,7 @@
 from flask import Flask, make_response, jsonify, request, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 from flask_restful import Resource, Api
 from models import User, Patch, Oscillator
 from database import db
@@ -10,7 +10,7 @@ from os import environ
 # from seed import seed_data
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True)
+CORS(app, origins=[environ.get('CLIENT_URL')], supports_credentials=True)
 
 app.secret_key = b'\xfc\xceRXDr\t]3\xed\x0f\x8e\xadg\xcb<'
 app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URL')
@@ -60,7 +60,6 @@ class Logout(Resource):
         return {'message': 'Logged out'}, 200
 
 class CheckSession(Resource):
-    @cross_origin(supports_credentials=True)
     def get(self):
         user_id = session.get('user_id')
         
@@ -68,21 +67,17 @@ class CheckSession(Resource):
         if user_id:
             print("found a user")
             user = User.query.filter(User.id == user_id).first()
-            response = jsonify(user.to_dict())
-            response.headers.add("Access-Control-Allow-Origin", "*")
-            return response, 200
+            payload = jsonify(user.to_dict())
+            return make_response(payload, 200)
         else:
             return {'message': '401: Not Authorized'}, 401
 
 class IndexPatch(Resource):
-    @cross_origin(supports_credentials=True)
     def get(self):
         patches = Patch.query.order_by(Patch.id).all()
         patch_dicts = [patch.to_dict() for patch in patches]
-
-        response = make_response(jsonify(patch_dicts))
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        return response, 200
+        payload = jsonify(patch_dicts)
+        return make_response(payload, 200)
 
     def post(self):
         data = request.get_json()

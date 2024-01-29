@@ -45,7 +45,7 @@ services:
     tty: true
     stdin_open: true
     ports:
-      - 8000:8000
+      - 3000:3000
 
 volumes:
   pgdata: {}
