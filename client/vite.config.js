@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: true,
-    port: 8000,
+    port: 3000,
     // comment hmr back in for hot reload:
     // hmr: {
     //   clientPort: 5173
