@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-function Header({ user, setUser }) {
+function Header({ user, setUser, API_URL }) {
     const [loginData, setLoginData] = useState({})
     const [authMode, setAuthMode] = useState(null)
     const [showHowToPlay, setshowHowToPlay] = useState(false)
@@ -14,7 +14,7 @@ function Header({ user, setUser }) {
         e.preventDefault()
 
         if (authMode == "log in") {
-            fetch("http://localhost:5000/login", {
+            fetch(`${API_URL}/login`, {
                 method: "POST",
                 credentials: "include",
                 headers: {
@@ -32,7 +32,7 @@ function Header({ user, setUser }) {
         }
 
         if (authMode == "sign up") {
-            fetch("http://localhost:5000/signup", {
+            fetch(`${API_URL}/signup`, {
                 method: "POST",
                 credentials: "include",
                 headers: {
@@ -53,7 +53,7 @@ function Header({ user, setUser }) {
     }
 
     function logOut(e) {
-        fetch("http://localhost:5000/logout", {
+        fetch(`${API_URL}/logout`, {
             method: "DELETE",
             credentials: "include",
             headers: {

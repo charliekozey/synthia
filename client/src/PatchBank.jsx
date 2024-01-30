@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Patch from './Patch'
 
-function PatchBank({ patchList, setPatchList, setLoadedPatch, setNodes, user, bankType, updateNodesRef }) {
+function PatchBank({ patchList, setPatchList, setLoadedPatch, setNodes, user, bankType, updateNodesRef, API_URL }) {
 
     function toggleInput(e) {
         setShowInput(show => !show)
@@ -45,7 +45,7 @@ function PatchBank({ patchList, setPatchList, setLoadedPatch, setNodes, user, ba
             ]
         }
 
-        fetch("http://localhost:5000/patches", {
+        fetch(`${API_URL}/patches`, {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",

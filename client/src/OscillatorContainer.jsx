@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Oscillator from './Oscillator'
 
-function OscillatorContainer({ loadedPatch, setLoadedPatch,  userPatchList, setUserPatchList, globalPatchList, setGlobalPatchList }) {
+function OscillatorContainer({ loadedPatch, setLoadedPatch,  userPatchList, setUserPatchList, globalPatchList, setGlobalPatchList, API_URL }) {
     const [isModified, setIsModified] = useState(false)
     const [editName, setEditName] = useState(false)
     const [newName, setNewName] = useState("")
@@ -22,7 +22,7 @@ function OscillatorContainer({ loadedPatch, setLoadedPatch,  userPatchList, setU
         // the slider values from each osc have been updating the loadedPatch in state
         // when this function runs, we set the new patches and the backend updates
 
-        fetch(`http://localhost:5000/patches/${loadedPatch.id}`, {
+        fetch(`${API_URL}/patches/${loadedPatch.id}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -53,7 +53,7 @@ function OscillatorContainer({ loadedPatch, setLoadedPatch,  userPatchList, setU
             }
         })
         
-        fetch(`http://localhost:5000/patches/${loadedPatch.id}`, {
+        fetch(`${API_URL}/patches/${loadedPatch.id}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",

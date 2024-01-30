@@ -287,7 +287,7 @@ function App() {
 
   return (
     <div id="main" ref={ref} tabIndex={0} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
-      <Header user={user} setUser={setUser} />
+      <Header user={user} setUser={setUser} API_URL={API_URL} />
       {loadedPatch &&
         <OscillatorContainer
           loadedPatch={loadedPatch}
@@ -296,6 +296,7 @@ function App() {
           setUserPatchList={setUserPatchList}
           globalPatchList={globalPatchList}
           setGlobalPatchList={setGlobalPatchList}
+          API_URL={API_URL}
         />}
 
       <div id="patch-container">
@@ -306,6 +307,7 @@ function App() {
           updateNodesRef={updateNodesRef}
           // setNodes={setNodes}
           bankType="global"
+          API_URL={API_URL}
         />
         {
           user ?
@@ -319,6 +321,7 @@ function App() {
               // setNodes={setNodes}
               user={user}
               bankType="user"
+              API_URL={API_URL}
             />
           </>
           :
