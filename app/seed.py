@@ -8,18 +8,18 @@ from app import app
 def seed_data():
     # if __name__ == '__main__':
     with app.app_context():
-        print("🗑 Clearing db... ")
-        Oscillator.query.delete()
-        Favorite.query.delete()
-        Patch.query.delete()
-        User.query.delete()
+        # print("🗑 Clearing db... ")
+        # Oscillator.query.delete()
+        # Favorite.query.delete()
+        # Patch.query.delete()
+        # User.query.delete()
 
         fake = Faker()
 
         print("🌱 Seeding Users...")
         users = []
-        for i in range(10):
-            user = User(name=fake.user_name())
+        for i in range(3):
+            user = User(name=f"{fake.user_name()}-SEED")
             users.append(user)
         db.session.add_all(users)
         db.session.commit()
@@ -27,7 +27,7 @@ def seed_data():
         print("🌱 Seeding Patches...")
         patches = []
         osc_types = ["sine", "triangle", "square", "sawtooth"]
-        for i in range(20):
+        for i in range(5):
             user = choice(users)
             patch = Patch(name=fake.color_name(), creator_id=user.id, oscillators=[])
             oscillator1 = Oscillator(
