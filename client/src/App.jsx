@@ -157,14 +157,25 @@ function App() {
         // const channelData = buffer.getChannelData(0)
         const attackTime = parseFloat(logifyValue(osc.attack)) * 0.1
         // console.log(osc.number + " activating")
-        const oscNode = new OscillatorNode(audioContext, { type: osc.osc_type, frequency: keyboard.current[input].freq })
+        // const oscNode = new OscillatorNode(audioContext, { type: osc.osc_type, frequency: keyboard.current[input].freq })
         const gainNode = new GainNode(audioContext, { gain: parseFloat(osc.gain) })
+        
+        let oscNode
+        if (osc.number === 1) {
+          oscNode = new OscillatorNode(audioContext, { type: osc.osc_type, frequency: keyboard.current[input].freq * 0.996 })
+        } else if (osc.number === 2) {
+          oscNode = new OscillatorNode(audioContext, { type: osc.osc_type, frequency: keyboard.current[input].freq })
+        } else if (osc.number === 3) {
+          oscNode = new OscillatorNode(audioContext, { type: osc.osc_type, frequency: keyboard.current[input].freq * 1.004 })
+        }
+
         const newNode = {
           osc_node: oscNode,
           gain_node: gainNode,
           key_pressed: input,
           osc_data: osc
         }
+
 
         // for (let i = 0; i < buffer.length; i++) {
         //   channelData[i] = Math.sin((i / sampleRate) * 2 * Math.PI * 440); // Generate a 440Hz sine wave
