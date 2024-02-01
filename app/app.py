@@ -13,8 +13,8 @@ app = Flask(__name__)
 CORS(app, origins=[environ.get('CLIENT_URL')], supports_credentials=True)
 
 app.secret_key = b'\xfc\xceRXDr\t]3\xed\x0f\x8e\xadg\xcb<'
-app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URL')
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/syn_db_2'
+# app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URL')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/syn_db_2'
 app.config['SESSION_COOKIE_SAMESITE'] = "None"
 app.config['SESSION_COOKIE_SECURE'] = True
 
