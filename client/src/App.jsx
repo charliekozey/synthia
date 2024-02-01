@@ -1,52 +1,3 @@
-function todo() {
-  // NOW DOING:
-  // fix broken post/patch
-
-  // TODO:
-  // social patch info
-  // remove unused gain node on note end
-  // waveform manipulation (asdr) for individual oscillators
-  // gain sliders not working right; i think there's an extra node hanging out somewhere
-  // fix: behavior differs between click+slide vs. click on gain sliders
-  // update gitignore
-  // fix static on gain slider change
-  // effects
-  // lfo
-  // EQ/filters
-  // beginner-friendly illustrations and self-guiding UI
-  // sequencer
-  // play more than 6 notes at a time?
-  // fix browser tab change bug (audio still plays)
-  // localize key map
-  // user profiles
-  // filter global patches by user
-  // filter patches by type (pad, bass, arp, etc)
-  // patch descriptions?
-  // patch tags
-
-  // REFACTOR: 
-  // abstract out updateGain/updateRelease/updateAttack etc functions
-
-  // IDEAS:
-  // target ed space? younger audience?
-  // display held down keys in visual representation (qwerty? piano? both?)
-  // calculate chord from held notes and display it
-  // incorporate sequencer, etc
-  // maybe similar target audience to hookpad?
-  // trackpad as xy manipulator for pitch, other params
-  // record output
-  // investigate beating
-  // ~ o s c i l l o s c o p e ~
-  // // https://www.twilio.com/blog/audio-visualisation-web-audio-api--react
-  // microtonality?
-  // stereo? spatial??
-  // arpeggiator
-  // import/export midi
-  // external controller support
-  // visual representation of each patch? 
-  // // diff sound parameters correspond to diff visuals
-}
-
 import { useEffect, useState, useRef } from 'react'
 import Header from './Header'
 import PatchBank from './PatchBank'
@@ -133,7 +84,8 @@ function App() {
   function handleKeyDown(e) {
     if (Object.keys(keyboard.current).includes(e.key)) startSound(e)
     if (e.key === "Escape") panic(e)
-    if (e.key === "x" || e.key === "z") changeOctave(e)
+    if (e.key === "z") octaveDown(e)
+    if (e.key === "x") octaveUp(e)
   }
 
   function handleKeyUp(e) {
@@ -227,13 +179,18 @@ function App() {
 
   }
 
-  function changeOctave(e) {
-    for (const note in keyboard.current) {
-      if (e.key == "z") {
-        keyboard.current[note].freq = keyboard.current[note].freq / 2
+  function octaveDown(e) {
+    if (keyboard.current["a"].freq > 66) {
+      for (const note in keyboard.current) {
+          keyboard.current[note].freq /= 2
       }
-      if (e.key == "x") {
-        keyboard.current[note].freq = keyboard.current[note].freq * 2
+    }
+  }
+
+  function octaveUp(e) {
+    if (keyboard.current["a"].freq < 1048) {
+      for (const note in keyboard.current) {
+          keyboard.current[note].freq *= 2
       }
     }
   }
